@@ -909,14 +909,9 @@ window.ART = (function () {
          style="cursor: pointer;" class="heroine-group" transform="translate(290, 145) scale(1.18)">
         <title>Meet Sunita (Class 10, Tailoring & Embroidery, Meerut)</title>
         <!-- Speech Bubble on hover or keyboard focus -->
-        <g transform="translate(10, -50)">
-          <g class="heroine-bubble">
-            <rect x="0" y="0" width="220" height="42" rx="12" fill="#FFF6E5" stroke="#0E4B33" stroke-width="2.5" />
-            <polygon points="45,42 55,42 50,50" fill="#FFF6E5" stroke="#0E4B33" stroke-width="2" />
-            <line x1="46" y1="41" x2="54" y2="41" stroke="#FFF6E5" stroke-width="3" />
-            <text x="110" y="26" font-family="'Nunito Sans', sans-serif" font-size="13" font-weight="700" fill="#2A2622" text-anchor="middle">"I sew. Now I want the certificate."</text>
-          </g>
-        </g>
+        <foreignObject class="heroine-bubble" x="10" y="-50" width="220" height="54">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="heroine-bubble-card heroine-bubble-card--sunita">"I sew. Now I want the certificate."</div>
+        </foreignObject>
         <!-- Subtle glow backdrop -->
         <circle cx="100" cy="140" r="110" fill="${PALETTE.marigold}" opacity="0.22" />
         ${woman({
@@ -942,14 +937,9 @@ window.ART = (function () {
          style="cursor: pointer;" class="heroine-group" transform="translate(590, 140) scale(1.22)">
         <title>Meet Priya (MSc Mathematics, Research Aspirant, Lucknow)</title>
         <!-- Speech Bubble on hover or keyboard focus -->
-        <g transform="translate(15, -50)">
-          <g class="heroine-bubble">
-            <rect x="0" y="0" width="210" height="42" rx="12" fill="#FFF6E5" stroke="#2B59D9" stroke-width="2.5" />
-            <polygon points="50,42 60,42 55,50" fill="#FFF6E5" stroke="#2B59D9" stroke-width="2" />
-            <line x1="51" y1="41" x2="59" y2="41" stroke="#FFF6E5" stroke-width="3" />
-            <text x="105" y="26" font-family="'Nunito Sans', sans-serif" font-size="13" font-weight="700" fill="#2A2622" text-anchor="middle">"I have an MSc. I want my PhD."</text>
-          </g>
-        </g>
+        <foreignObject class="heroine-bubble" x="15" y="-50" width="210" height="54">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="heroine-bubble-card heroine-bubble-card--priya">"I have an MSc. I want my PhD."</div>
+        </foreignObject>
         <circle cx="100" cy="140" r="115" fill="${PALETTE.blush}" opacity="0.25" />
         ${woman({
           skin: PALETTE.skinTones[2], // #C08052
@@ -975,14 +965,9 @@ window.ART = (function () {
          style="cursor: pointer;" class="heroine-group" transform="translate(890, 145) scale(1.18)">
         <title>Meet Anjali (Class 12, Resuming Degree, Kanpur)</title>
         <!-- Speech Bubble on hover or keyboard focus -->
-        <g transform="translate(10, -50)">
-          <g class="heroine-bubble">
-            <rect x="0" y="0" width="230" height="42" rx="12" fill="#FFF6E5" stroke="#D2401F" stroke-width="2.5" />
-            <polygon points="45,42 55,42 50,50" fill="#FFF6E5" stroke="#D2401F" stroke-width="2" />
-            <line x1="46" y1="41" x2="54" y2="41" stroke="#FFF6E5" stroke-width="3" />
-            <text x="115" y="26" font-family="'Nunito Sans', sans-serif" font-size="13" font-weight="700" fill="#2A2622" text-anchor="middle">"I'm going back to finish my degree."</text>
-          </g>
-        </g>
+        <foreignObject class="heroine-bubble" x="10" y="-50" width="230" height="54">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="heroine-bubble-card heroine-bubble-card--anjali">"I'm going back to finish my degree."</div>
+        </foreignObject>
         <circle cx="100" cy="140" r="110" fill="${PALETTE.cream}" opacity="0.3" />
         ${woman({
           skin: PALETTE.skinTones[0], // #F3D0B0

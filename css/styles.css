@@ -904,15 +904,6 @@ img, svg {
   display: block;
 }
 
-.heroine-group {
-  transition: transform 0.25s ease, filter 0.25s ease;
-}
-
-.heroine-group:hover,
-.heroine-group:focus-visible {
-  transform: scale(1.05);
-}
-
 /* Prefers-Reduced-Motion: ALL motion off strictly per docs/design-brief.md */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -921,7 +912,7 @@ img, svg {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .card--tilt-left, .card--tilt-right, .note, .sway-slow, .heroine-group {
+  .card--tilt-left, .card--tilt-right, .note, .sway-slow {
     transform: none !important;
   }
 }
@@ -1222,16 +1213,62 @@ img, svg {
 
 .heroine-bubble {
   opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
   pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.heroine-bubble-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+  padding: 5px 8px;
+  border: 2.5px solid var(--bubble-stroke);
+  border-radius: 12px;
+  background: #FFF6E5;
+  color: #2A2622;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  pointer-events: none;
+}
+
+.heroine-bubble-card::after {
+  position: absolute;
+  bottom: -8px;
+  left: 22%;
+  width: 12px;
+  height: 12px;
+  border-right: 2.5px solid var(--bubble-stroke);
+  border-bottom: 2.5px solid var(--bubble-stroke);
+  background: #FFF6E5;
+  content: "";
+  transform: skewY(35deg) rotate(45deg);
+}
+
+.heroine-bubble-card--sunita {
+  --bubble-stroke: #0E4B33;
+}
+
+.heroine-bubble-card--priya {
+  --bubble-stroke: #2B59D9;
+}
+
+.heroine-bubble-card--anjali {
+  --bubble-stroke: #D2401F;
 }
 
 .heroine-group:hover .heroine-bubble,
 .heroine-group:focus-visible .heroine-bubble,
 .heroine-group:focus .heroine-bubble {
   opacity: 1;
-  transform: translateY(0);
 }
 
 /* Three Women Paper Cards with Precise Rotations */
