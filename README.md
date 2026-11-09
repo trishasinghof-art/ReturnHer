@@ -8,7 +8,7 @@ Live demo: https://your-username.github.io/returnher/
 
 Built for Hackathon Name, Month 2026.
 
-![ReturnHer home page](assets/og-image.png)
+![ReturnHer home page](C:\Users\trish\OneDrive\Desktop\ReturnHer\assets\og-image.png)
 
 ## Problem
 
