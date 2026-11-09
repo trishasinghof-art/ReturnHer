@@ -876,18 +876,45 @@ window.ART = (function () {
         })}
       </g>
 
-      <!-- Decorative foreground blooms between rows -->
+      <!-- Decorative foreground blooms between rows & crossing bottom edge into next section -->
       <g transform="translate(180, 360)">${decor("bangles", { size: 48 })}</g>
-      <g transform="translate(480, 380)">${decor("marigold", { size: 42 })}</g>
-      <g transform="translate(930, 375)">${decor("marigold", { size: 42 })}</g>
+      <g transform="translate(480, 380)">${decor("marigold", { size: 42, className: "rotate-flower" })}</g>
+      <g transform="translate(930, 375)">${decor("marigold", { size: 42, className: "rotate-flower" })}</g>
       <g transform="translate(1240, 360)">${decor("paisley", { size: 46 })}</g>
+
+      <!-- Props & motifs crossing bottom hero boundary into the cream section below -->
+      <g transform="translate(110, 475)">${decor("marigold", { size: 50, className: "rotate-flower" })}</g>
+      <!-- Marigold garland swags crossing bottom boundary -->
+      <g transform="translate(340, 478)">
+        <path d="M0,0 Q110,36 220,0" stroke="${PALETTE.marigold}" stroke-width="3" fill="none" stroke-dasharray="5 4" />
+        <circle cx="55" cy="16" r="9" fill="${PALETTE.marigold}" />
+        <circle cx="110" cy="20" r="11" fill="${PALETTE.vermilion}" />
+        <circle cx="165" cy="16" r="9" fill="${PALETTE.marigold}" />
+      </g>
+      <g transform="translate(680, 470)">${decor("bird", { size: 46, color: PALETTE.marigold, color2: PALETTE.vermilion })}</g>
+      <g transform="translate(880, 478)">
+        <path d="M0,0 Q110,36 220,0" stroke="${PALETTE.marigold}" stroke-width="3" fill="none" stroke-dasharray="5 4" />
+        <circle cx="55" cy="16" r="9" fill="${PALETTE.marigold}" />
+        <circle cx="110" cy="20" r="11" fill="${PALETTE.vermilion}" />
+        <circle cx="165" cy="16" r="9" fill="${PALETTE.marigold}" />
+      </g>
+      <g transform="translate(1160, 472)">${decor("marigold", { size: 52, className: "rotate-flower" })}</g>
 
       <!-- ================= LAYER 2: THREE FRONT-ROW HEROINES ================= -->
 
       <!-- Heroine 1: SUNITA (Meerut - Tailor: Needle & Spool, Saree) -->
-      <g data-profile="sunita" tabindex="0" role="link" aria-label="Meet Sunita, master tailor from Meerut"
-         style="cursor: pointer; outline: none;" class="heroine-group" transform="translate(290, 145) scale(1.18)">
+      <g data-profile="sunita" tabindex="0" role="link" aria-label="Meet Sunita, master tailor from Meerut. I sew. Now I want the certificate."
+         style="cursor: pointer;" class="heroine-group" transform="translate(290, 145) scale(1.18)">
         <title>Meet Sunita (Class 10, Tailoring & Embroidery, Meerut)</title>
+        <!-- Speech Bubble on hover or keyboard focus -->
+        <g transform="translate(10, -50)">
+          <g class="heroine-bubble">
+            <rect x="0" y="0" width="220" height="42" rx="12" fill="#FFF6E5" stroke="#0E4B33" stroke-width="2.5" />
+            <polygon points="45,42 55,42 50,50" fill="#FFF6E5" stroke="#0E4B33" stroke-width="2" />
+            <line x1="46" y1="41" x2="54" y2="41" stroke="#FFF6E5" stroke-width="3" />
+            <text x="110" y="26" font-family="'Nunito Sans', sans-serif" font-size="13" font-weight="700" fill="#2A2622" text-anchor="middle">"I sew. Now I want the certificate."</text>
+          </g>
+        </g>
         <!-- Subtle glow backdrop -->
         <circle cx="100" cy="140" r="110" fill="${PALETTE.marigold}" opacity="0.22" />
         ${woman({
@@ -909,9 +936,18 @@ window.ART = (function () {
       </g>
 
       <!-- Heroine 2: PRIYA (Lucknow - Scholar: Books & Graduation Cap, MSc) -->
-      <g data-profile="priya" tabindex="0" role="link" aria-label="Meet Priya, MSc Mathematics scholar from Lucknow"
-         style="cursor: pointer; outline: none;" class="heroine-group" transform="translate(590, 140) scale(1.22)">
+      <g data-profile="priya" tabindex="0" role="link" aria-label="Meet Priya, MSc Mathematics scholar from Lucknow. I have an MSc. I want my PhD."
+         style="cursor: pointer;" class="heroine-group" transform="translate(590, 140) scale(1.22)">
         <title>Meet Priya (MSc Mathematics, Research Aspirant, Lucknow)</title>
+        <!-- Speech Bubble on hover or keyboard focus -->
+        <g transform="translate(15, -50)">
+          <g class="heroine-bubble">
+            <rect x="0" y="0" width="210" height="42" rx="12" fill="#FFF6E5" stroke="#2B59D9" stroke-width="2.5" />
+            <polygon points="50,42 60,42 55,50" fill="#FFF6E5" stroke="#2B59D9" stroke-width="2" />
+            <line x1="51" y1="41" x2="59" y2="41" stroke="#FFF6E5" stroke-width="3" />
+            <text x="105" y="26" font-family="'Nunito Sans', sans-serif" font-size="13" font-weight="700" fill="#2A2622" text-anchor="middle">"I have an MSc. I want my PhD."</text>
+          </g>
+        </g>
         <circle cx="100" cy="140" r="115" fill="${PALETTE.blush}" opacity="0.25" />
         ${woman({
           skin: PALETTE.skinTones[2], // #C08052
@@ -933,9 +969,18 @@ window.ART = (function () {
       </g>
 
       <!-- Heroine 3: ANJALI (Kanpur - Learner: Notebook, Kurta with Jeans) -->
-      <g data-profile="anjali" tabindex="0" role="link" aria-label="Meet Anjali, student resuming education from Kanpur"
-         style="cursor: pointer; outline: none;" class="heroine-group" transform="translate(890, 145) scale(1.18)">
+      <g data-profile="anjali" tabindex="0" role="link" aria-label="Meet Anjali, student resuming education from Kanpur. I'm going back to finish my degree."
+         style="cursor: pointer;" class="heroine-group" transform="translate(890, 145) scale(1.18)">
         <title>Meet Anjali (Class 12, Resuming Degree, Kanpur)</title>
+        <!-- Speech Bubble on hover or keyboard focus -->
+        <g transform="translate(10, -50)">
+          <g class="heroine-bubble">
+            <rect x="0" y="0" width="230" height="42" rx="12" fill="#FFF6E5" stroke="#D2401F" stroke-width="2.5" />
+            <polygon points="45,42 55,42 50,50" fill="#FFF6E5" stroke="#D2401F" stroke-width="2" />
+            <line x1="46" y1="41" x2="54" y2="41" stroke="#FFF6E5" stroke-width="3" />
+            <text x="115" y="26" font-family="'Nunito Sans', sans-serif" font-size="13" font-weight="700" fill="#2A2622" text-anchor="middle">"I'm going back to finish my degree."</text>
+          </g>
+        </g>
         <circle cx="100" cy="140" r="110" fill="${PALETTE.cream}" opacity="0.3" />
         ${woman({
           skin: PALETTE.skinTones[0], // #F3D0B0

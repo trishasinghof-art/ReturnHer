@@ -15,6 +15,9 @@
     TRACKER_PROGRESS: "returnher_tracker",
     APPLICATION_STAGES: "returnher_app_stages"
   };
+  let onboardingDraft = null;
+  let onboardingStep = 0;
+  let onboardingDirection = "next";
 
   // --- SVG Icons & Decorative Motifs (No 4-point sparkle star, no AI robot icons) ---
   const ICONS = {
@@ -218,7 +221,16 @@
     const profile = Storage.getProfile();
     const currentLang = window.I18N.getLanguage();
 
-    navEl.className = "navbar";
+    const isHome = currentHash === "#/home" || currentHash === "" || currentHash === "#" || currentHash === "#/";
+    navEl.className = isHome ? "navbar navbar--hero" : "navbar";
+
+    const authPill = profile
+      ? `<a href="#/me" class="btn btn-sm ${isHome ? 'btn-outline-dark' : 'btn-outline'}" style="border-radius: var(--radius-pill); font-size:15px;">
+          <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--color-marigold); margin-right:4px;"></span>
+          ${escapeHtml(profile.name)}
+        </a>`
+      : `<a href="#/signin" class="btn btn-sm ${isHome ? 'btn-on-dark' : 'btn-primary'}">${t("nav.signin")}</a>`;
+
     navEl.innerHTML = `
       <div class="navbar-container">
         <a href="#/home" class="navbar-brand">
@@ -238,14 +250,7 @@
             ${currentLang === "en" ? "हिन्दी" : "English"}
           </button>
 
-          ${
-            profile
-              ? `<a href="#/me" class="btn btn-sm btn-outline" style="border-radius: var(--radius-pill); font-size:15px;">
-                  <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--color-vermilion); margin-right:4px;"></span>
-                  ${escapeHtml(profile.name)}
-                </a>`
-              : `<a href="#/signin" class="btn btn-sm btn-primary">${t("nav.signin")}</a>`
-          }
+          ${authPill}
 
           <button class="navbar-hamburger" id="navbar-hamburger-btn" aria-label="Toggle navigation">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -282,13 +287,14 @@
           <div class="footer-brand">
             <div style="display:flex; align-items:center; gap:12px; margin-bottom: 12px;">
               <span style="width:36px; height:36px; display:inline-block;">${ICONS.marigold}</span>
-              <h2>${t("brand.name")}</h2>
+              <h2 style="color: var(--color-cream); font-size: 38px; margin: 0;">${t("brand.name")}</h2>
             </div>
+            <p style="color: var(--color-cream); font-size: 18px; margin-bottom: 8px; opacity: 0.95;">${t("tagline.strap")}</p>
             <p class="footer-tagline">“${t("tagline.footer")}”</p>
           </div>
 
           <ul class="footer-links">
-            <li><strong>${t("tagline.strap")}</strong></li>
+            <li><strong>Quick Links</strong></li>
             <li><a href="#/home">${t("nav.home")}</a></li>
             <li><a href="#/explore">${t("nav.explore")}</a></li>
             <li><a href="#/start">${t("btn.start_onboarding")}</a></li>
@@ -297,9 +303,20 @@
           </ul>
         </div>
 
+        <!-- Plain text official portal names per BRIEF.md -->
+        <div style="padding: 20px 0; border-top: 1px solid rgba(255, 246, 229, 0.15); border-bottom: 1px solid rgba(255, 246, 229, 0.15); margin-bottom: 24px;">
+          <p style="font-size: 15px; color: var(--color-marigold); margin-bottom: 6px; font-weight: 700;">
+            Official Government Sources & Portals:
+          </p>
+          <p style="font-size: 15px; color: rgba(255, 246, 229, 0.85); line-height: 1.6;">
+            Skill India Digital &bull; National Career Service (NCS) &bull; National Scholarship Portal (NSP) &bull; Common Fellowship Portal &bull; UGC Distance Education Bureau (DEB) &bull; Stand-Up India &bull; Aajeevika (DAY-NRLM)
+          </p>
+        </div>
+
         <div class="footer-bottom">
-          <p>${t("notice.source")} &bull; ${t("notice.prototype")}</p>
-          <p>${t("tagline.sakhi")} &copy; 2026 ReturnHer</p>
+          <p><strong>${t("notice.privacy")}</strong></p>
+          <p>${t("notice.prototype")} &bull; ${t("notice.source")}</p>
+          <p>&copy; 2026 ReturnHer &bull; ${t("tagline.sakhi")}</p>
         </div>
       </div>
     `;
@@ -310,181 +327,386 @@
   // 1. Home View (#/home)
   function renderHome() {
     const app = document.getElementById("app-view");
-    const profiles = window.PROFILES || [];
+    const currentLang = window.I18N.getLanguage();
 
     app.innerHTML = `
-      <!-- Hero Section (Forest) -->
+      <!-- ================= SECTION 1: HERO (Forest) ================= -->
       <section class="section section-forest" style="padding-bottom: 0;">
-        <div class="container text-center" style="max-width: 900px; margin: 0 auto; padding-top: 32px; padding-bottom: 32px;">
-          <div style="display:inline-flex; align-items:center; gap:8px; margin-bottom: 24px;" class="fade-up">
-            <span style="width:28px; height:28px;">${ICONS.marigold}</span>
-            <span class="tag tag--opportunity">${t("tagline.short")}</span>
+        <div class="container text-center" style="max-width: 960px; margin: 0 auto; padding-top: 28px; padding-bottom: 20px;">
+          <div class="hero-label-wrap fade-up" style="display:inline-flex; align-items:center; gap:8px; margin-bottom: 20px;">
+            <span style="width:24px; height:24px; display:inline-block;">${ICONS.marigold}</span>
+            <span class="tag tag--opportunity" style="font-size: 15px;">${t("hero.label")}</span>
           </div>
 
-          <h1 class="fade-up" style="margin-bottom: 24px; color: var(--color-cream);">
-            ${t("tagline.hero")}
+          <h1 class="fade-up" style="margin-bottom: 24px; color: var(--color-cream); font-size: clamp(44px, 7vw, 84px); line-height: 1.05;">
+            ${currentLang === "hi"
+              ? `सफ़र रुका था, <span class="hero-highlight">मौके नहीं।${window.ART ? window.ART.hand.underline("#FFC21A") : ""}</span>`
+              : `Your journey paused. Your opportunities <span class="hero-highlight">didn't.${window.ART ? window.ART.hand.underline("#FFC21A") : ""}</span>`
+            }
           </h1>
 
-          <p class="fade-up" style="font-size: 22px; color: rgba(255, 246, 229, 0.95); margin-bottom: 32px; max-width: 760px; margin-left: auto; margin-right: auto;">
-            ${t("route.home.subtitle")}
+          <p class="fade-up" style="font-size: 20px; color: rgba(255, 246, 229, 0.95); margin-bottom: 32px; max-width: 760px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+            ${t("hero.desc")}
           </p>
 
-          <div class="fade-up" style="display:flex; flex-wrap:wrap; gap:16px; justify-content:center; margin-bottom: 36px;">
-            <a href="#/start" class="btn btn-on-dark">${t("btn.begin")} ${ICONS.arrowRight}</a>
-            <a href="#/explore" class="btn btn-outline-dark">${t("btn.explore")}</a>
+          <div class="fade-up" style="display:flex; flex-wrap:wrap; gap:16px; justify-content:center; margin-bottom: 28px;">
+            <a href="#/start" class="btn btn-on-dark" style="font-size: 18px; font-weight: 700;">${t("hero.btn_path")} &rarr;</a>
+            <a href="#three-women" class="btn btn-outline-dark" style="font-size: 18px; font-weight: 700;">${t("hero.btn_women")}</a>
           </div>
         </div>
 
-        <!-- Hero Crowd Banner Illustration (Slot) -->
-        <div class="hero-crowd-wrapper fade-up" style="width: 100%; max-width: 1300px; margin: 0 auto; line-height: 0;">
-          ${window.ART ? window.ART.slot("hero-crowd", "Hero banner of nine diverse Indian women of all ages beginning their next chapter", "hero-crowd-art") : ""}
+        <!-- Full-width Hero Crowd Bleeding Out of the Bottom -->
+        <div class="hero-crowd-wrapper fade-up" style="width: 100%; max-width: 1440px; margin: 0 auto; line-height: 0; position: relative; z-index: 2; margin-bottom: -32px; overflow: visible;">
+          ${window.ART ? window.ART.crowd() : ""}
         </div>
 
-        <div style="color: var(--color-cream); margin-top: -2px;">
-          ${ICONS.waveDivider}
+        <!-- Interaction Hint under Crowd -->
+        <div class="fade-up" style="display:flex; align-items:center; justify-content:center; gap:8px; padding-bottom: 24px; color: var(--color-cream); font-size: 16px; font-weight: 700; position: relative; z-index: 3;">
+          <span>${window.ART ? window.ART.hand.arrowDotted("#FFC21A") : "&rarr;"}</span>
+          <span>${t("hero.tap_hint")}</span>
+        </div>
+
+        <!-- Wave Divider transitioning Forest into Cream -->
+        <div class="divider" style="color: var(--color-cream); margin-top: -16px; position: relative; z-index: 1;" aria-hidden="true">
+          <svg viewBox="0 0 1200 48" preserveAspectRatio="none" fill="currentColor">
+            <path d="M0,0 C150,42 350,48 500,24 C650,0 850,44 1050,22 C1150,11 1200,32 1200,48 L1200,48 L0,48 Z"></path>
+          </svg>
         </div>
       </section>
 
-      <!-- Pillars Section (Cream) -->
-      <section class="section section-cream">
+      <!-- ================= SECTION 2: THREE WOMEN (Cream) ================= -->
+      <section class="section section-cream" id="three-women" style="padding-top: 56px; padding-bottom: 80px;">
         <div class="container">
-          <div class="text-center" style="margin-bottom: 48px; max-width: 720px; margin-left: auto; margin-right: auto;">
-            <span class="tag tag--support" style="margin-bottom: 12px;">${t("tagline.strap")}</span>
-            <h2>${t("tagline.ways")}</h2>
+          <div class="text-center" style="margin-bottom: 48px;">
+            <span class="tag tag--support" style="margin-bottom: 12px;">${t("tagline.short")}</span>
+            <h2 style="color: var(--color-forest);">${t("tagline.women")}</h2>
           </div>
 
-          <div class="grid-staggered">
-            <!-- Education -->
-            <div class="card shape-arch card--tilt-left block-behind block-behind--cobalt fade-up">
-              <span class="tag tag--education" style="margin-bottom: 16px;">${t("pillar.education")}</span>
-              <h3 style="margin-bottom: 12px; color: var(--color-cobalt); font-size: 26px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 36px; align-items: start; padding-top: 24px;">
+            <!-- Sunita (Tailor, Meerut) -->
+            <div class="card note card--tilt-sunita block-behind block-behind--cobalt fade-up" style="background: #FFFDF4; border: 2px solid var(--color-ink); border-radius: 20px; padding: 32px 24px 28px;">
+              <div style="margin: -64px -10px 10px -10px; height: 190px; overflow: visible; display: flex; justify-content: center;">
+                ${window.ART ? window.ART.scene("tailor") : ""}
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                <h3 style="font-size: 26px; color: var(--color-forest);">Sunita</h3>
+                <span class="tag">Meerut, UP</span>
+              </div>
+              <p style="font-size: 15px; font-weight: 700; color: var(--color-cobalt); margin-bottom: 14px;">Class 10 &bull; 5 yrs tailoring experience</p>
+              <blockquote style="font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; color: var(--color-ink); font-style: italic;">
+                “${t("quote.sunita")}”
+              </blockquote>
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 24px;">
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">tailoring</span>
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">embroidery</span>
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">teach others</span>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('sunita')" style="width: 100%;">
+                ${currentLang === "hi" ? "सुनीता का रास्ता देखें" : "See Sunita's path"} &rarr;
+              </button>
+            </div>
+
+            <!-- Priya (Scholar, Lucknow) -->
+            <div class="card note card--tilt-priya block-behind block-behind--vermilion fade-up" style="background: #FFFDF4; border: 2px solid var(--color-ink); border-radius: 20px; padding: 32px 24px 28px;">
+              <div style="margin: -64px -10px 10px -10px; height: 190px; overflow: visible; display: flex; justify-content: center;">
+                ${window.ART ? window.ART.scene("scholar") : ""}
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                <h3 style="font-size: 26px; color: var(--color-forest);">Priya</h3>
+                <span class="tag">Lucknow, UP</span>
+              </div>
+              <p style="font-size: 15px; font-weight: 700; color: var(--color-vermilion); margin-bottom: 14px;">MSc Mathematics &bull; Postgraduate</p>
+              <blockquote style="font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; color: var(--color-ink); font-style: italic;">
+                “${t("quote.priya")}”
+              </blockquote>
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 24px;">
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">mathematics</span>
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">academic research</span>
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">fellowship</span>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('priya')" style="width: 100%;">
+                ${currentLang === "hi" ? "प्रिया का रास्ता देखें" : "See Priya's path"} &rarr;
+              </button>
+            </div>
+
+            <!-- Anjali (Learner, Kanpur) -->
+            <div class="card note card--tilt-anjali block-behind block-behind--marigold fade-up" style="background: #FFFDF4; border: 2px solid var(--color-ink); border-radius: 20px; padding: 32px 24px 28px;">
+              <div style="margin: -64px -10px 10px -10px; height: 190px; overflow: visible; display: flex; justify-content: center;">
+                ${window.ART ? window.ART.scene("learner") : ""}
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                <h3 style="font-size: 26px; color: var(--color-forest);">Anjali</h3>
+                <span class="tag">Kanpur, UP</span>
+              </div>
+              <p style="font-size: 15px; font-weight: 700; color: var(--color-forest); margin-bottom: 14px;">Class 12 &bull; Paused Education</p>
+              <blockquote style="font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; color: var(--color-ink); font-style: italic;">
+                “${t("quote.anjali")}”
+              </blockquote>
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 24px;">
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">writing</span>
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">computers</span>
+                <span class="chip" style="font-size: 13px; padding: 4px 10px;">degree</span>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('anjali')" style="width: 100%;">
+                ${currentLang === "hi" ? "अंजलि का रास्ता देखें" : "See Anjali's path"} &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 3: HOW IT WORKS (Oat) ================= -->
+      <section class="section section-oat" style="padding-top: 0; padding-bottom: 80px; overflow: visible;">
+        <!-- Scalloped Divider above -->
+        <div class="divider" style="color: var(--color-oat); margin-top: -36px; margin-bottom: 40px;" aria-hidden="true">
+          <svg viewBox="0 0 1200 36" preserveAspectRatio="none" fill="currentColor">
+            <path d="M0,0 Q30,36 60,0 Q90,36 120,0 Q150,36 180,0 Q210,36 240,0 Q270,36 300,0 Q330,36 360,0 Q390,36 420,0 Q450,36 480,0 Q510,36 540,0 Q570,36 600,0 Q630,36 660,0 Q690,36 720,0 Q750,36 780,0 Q810,36 840,0 Q870,36 900,0 Q930,36 960,0 Q990,36 1020,0 Q1050,36 1080,0 Q1110,36 1140,0 Q1170,36 1200,0 L1200,36 L0,36 Z"></path>
+          </svg>
+        </div>
+
+        <div class="container text-center" style="margin-bottom: 48px;">
+          <span class="tag tag--opportunity" style="margin-bottom: 12px;">${t("tagline.strap")}</span>
+          <h2 style="color: var(--color-forest);">${t("tagline.how")}</h2>
+        </div>
+
+        <div class="how-container container">
+          <!-- Winding Dotted SVG Path that draws itself on scroll -->
+          <svg class="how-svg-container" viewBox="0 0 1000 680" fill="none" aria-hidden="true">
+            <path class="journey-path" d="M 120,70 C 450,70 780,180 820,290 C 860,400 450,540 140,610" stroke="#0E4B33" stroke-width="4.5" fill="none" stroke-linecap="round" />
+          </svg>
+
+          <!-- 3 Stops in S-Curve -->
+          <div class="how-stops-list">
+            <!-- Stop 1 (Left) -->
+            <div class="how-stop fade-up">
+              <div class="how-num-badge how-num-badge--cobalt">1</div>
+              <div class="how-card">
+                <h3 style="font-size: 24px; color: var(--color-cobalt); margin-bottom: 8px;">
+                  ${t("how.step1.title")}
+                </h3>
+                <p style="font-size: 16px; margin: 0; line-height: 1.5;">
+                  ${t("how.step1.desc")}
+                </p>
+              </div>
+              <div class="how-scene-thumb">
+                ${window.ART ? window.ART.scene("doorway") : ""}
+              </div>
+            </div>
+
+            <!-- Stop 2 (Right) -->
+            <div class="how-stop how-stop--right fade-up">
+              <div class="how-num-badge how-num-badge--vermilion">2</div>
+              <div class="how-card">
+                <h3 style="font-size: 24px; color: var(--color-vermilion); margin-bottom: 8px;">
+                  ${t("how.step2.title")}
+                </h3>
+                <p style="font-size: 16px; margin: 0; line-height: 1.5;">
+                  ${t("how.step2.desc")}
+                </p>
+              </div>
+              <div class="how-scene-thumb">
+                ${window.ART ? window.ART.scene("scholar") : ""}
+              </div>
+            </div>
+
+            <!-- Stop 3 (Left) -->
+            <div class="how-stop fade-up">
+              <div class="how-num-badge how-num-badge--forest">3</div>
+              <div class="how-card">
+                <h3 style="font-size: 24px; color: var(--color-forest); margin-bottom: 8px;">
+                  ${t("how.step3.title")}
+                </h3>
+                <p style="font-size: 16px; margin: 0; line-height: 1.5;">
+                  ${t("how.step3.desc")}
+                </p>
+              </div>
+              <div class="how-scene-thumb">
+                ${window.ART ? window.ART.scene("tailor") : ""}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 4: FOUR WAYS IN (Blush) ================= -->
+      <section class="section section-blush" style="padding-top: 64px; padding-bottom: 80px;">
+        <div class="container">
+          <div class="text-center" style="margin-bottom: 56px;">
+            <span class="tag tag--support" style="margin-bottom: 12px;">${t("tagline.strap")}</span>
+            <h2 style="color: var(--color-forest);">${t("tagline.ways")}</h2>
+          </div>
+
+          <div class="ways-grid">
+            <!-- 1. Education (Arch-top) -->
+            <div class="card shape-arch card--tilt-left block-behind block-behind--cobalt fade-up" style="padding: 28px 24px 28px;">
+              <div style="margin: -50px -10px 10px -10px; height: 180px; overflow: visible; display: flex; justify-content: center;">
+                ${window.ART ? window.ART.scene("scholar") : ""}
+              </div>
+              <span class="tag tag--education" style="margin-bottom: 14px;">${t("pillar.education")}</span>
+              <h3 style="color: var(--color-cobalt); font-size: 24px; margin-bottom: 10px;">
                 ${t("tagline.edu")}
               </h3>
-              <p style="margin-bottom: 20px;">${t("pillar.education.desc")}</p>
+              <p style="font-size: 16px; margin-bottom: 22px;">${t("pillar.education.desc")}</p>
               <a href="#/explore?pillar=education" class="btn btn-sm btn-outline">${t("btn.explore")} &rarr;</a>
             </div>
 
-            <!-- Certification -->
-            <div class="card shape-leaf card--tilt-right block-behind block-behind--vermilion fade-up">
-              <span class="tag tag--certification" style="margin-bottom: 16px;">${t("pillar.certification")}</span>
-              <h3 style="margin-bottom: 12px; color: var(--color-vermilion); font-size: 26px;">
+            <!-- 2. Certification (Leaf shape) -->
+            <div class="card shape-leaf card--tilt-right block-behind block-behind--vermilion fade-up" style="padding: 28px 24px 28px;">
+              <div style="margin: -50px -10px 10px -10px; height: 180px; overflow: visible; display: flex; justify-content: center;">
+                ${window.ART ? window.ART.scene("tailor") : ""}
+              </div>
+              <span class="tag tag--certification" style="margin-bottom: 14px;">${t("pillar.certification")}</span>
+              <h3 style="color: var(--color-vermilion); font-size: 24px; margin-bottom: 10px;">
                 ${t("tagline.cert")}
               </h3>
-              <p style="margin-bottom: 20px;">${t("pillar.certification.desc")}</p>
+              <p style="font-size: 16px; margin-bottom: 22px;">${t("pillar.certification.desc")}</p>
               <a href="#/explore?pillar=certification" class="btn btn-sm btn-outline">${t("btn.explore")} &rarr;</a>
             </div>
 
-            <!-- Opportunity -->
-            <div class="card shape-leaf card--tilt-left block-behind block-behind--forest fade-up">
-              <span class="tag tag--opportunity" style="margin-bottom: 16px;">${t("pillar.opportunity")}</span>
-              <h3 style="margin-bottom: 12px; color: var(--color-forest); font-size: 26px;">
+            <!-- 3. Opportunity (28px rounded) -->
+            <div class="card block-behind block-behind--marigold fade-up" style="border-radius: 28px; padding: 28px 24px 28px;">
+              <div style="margin: -50px -10px 10px -10px; height: 180px; overflow: visible; display: flex; justify-content: center;">
+                ${window.ART ? window.ART.scene("entrepreneur") : ""}
+              </div>
+              <span class="tag tag--opportunity" style="margin-bottom: 14px;">${t("pillar.opportunity")}</span>
+              <h3 style="color: var(--color-forest); font-size: 24px; margin-bottom: 10px;">
                 ${t("tagline.opp")}
               </h3>
-              <p style="margin-bottom: 20px;">${t("pillar.opportunity.desc")}</p>
+              <p style="font-size: 16px; margin-bottom: 22px;">${t("pillar.opportunity.desc")}</p>
               <a href="#/explore?pillar=opportunity" class="btn btn-sm btn-outline">${t("btn.explore")} &rarr;</a>
             </div>
 
-            <!-- Support -->
-            <div class="card shape-arch card--tilt-right block-behind block-behind--blush fade-up">
-              <span class="tag tag--support" style="margin-bottom: 16px;">${t("pillar.support")}</span>
-              <h3 style="margin-bottom: 12px; color: var(--color-forest); font-size: 26px;">
+            <!-- 4. Support (Circle-cornered) -->
+            <div class="card block-behind block-behind--forest fade-up" style="border-radius: 64px 28px 28px 64px; padding: 28px 24px 28px;">
+              <div style="margin: -50px -10px 10px -10px; height: 180px; overflow: visible; display: flex; justify-content: center;">
+                ${window.ART ? window.ART.scene("teacher") : ""}
+              </div>
+              <span class="tag tag--support" style="margin-bottom: 14px;">${t("pillar.support")}</span>
+              <h3 style="color: var(--color-forest); font-size: 24px; margin-bottom: 10px;">
                 ${t("tagline.support")}
               </h3>
-              <p style="margin-bottom: 20px;">${t("pillar.support.desc")}</p>
+              <p style="font-size: 16px; margin-bottom: 22px;">${t("pillar.support.desc")}</p>
               <a href="#/explore?pillar=support" class="btn btn-sm btn-outline">${t("btn.explore")} &rarr;</a>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Three Women Section (Oat) -->
-      <section class="section section-oat">
-        <div class="container">
-          <div style="margin-bottom: 44px; text-align: center;">
-            <span class="tag" style="margin-bottom: 12px;">${t("tagline.how")}</span>
-            <h2>${t("tagline.women")}</h2>
+      <!-- ================= SECTION 5: PROMISE (Forest) ================= -->
+      <section class="section section-forest" style="padding-top: 0; padding-bottom: 80px;">
+        <!-- Wave Divider transitioning Blush into Forest -->
+        <div class="divider" style="color: var(--color-forest); margin-top: -36px; margin-bottom: 40px;" aria-hidden="true">
+          <svg viewBox="0 0 1200 48" preserveAspectRatio="none" fill="currentColor">
+            <path d="M0,0 C150,42 350,48 500,24 C650,0 850,44 1050,22 C1150,11 1200,32 1200,48 L1200,48 L0,48 Z"></path>
+          </svg>
+        </div>
+
+        <div class="container text-center" style="margin-bottom: 56px;">
+          <span class="tag tag--opportunity" style="margin-bottom: 12px;">${t("tagline.sakhi")}</span>
+          <h2 style="color: var(--color-cream);">${t("tagline.promise")}</h2>
+        </div>
+
+        <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px;">
+          <!-- Promise 1 -->
+          <div class="fade-up" style="border: 2px solid rgba(255, 246, 229, 0.4); border-radius: 24px; padding: 32px 28px; background: rgba(10, 47, 33, 0.5);">
+            <div style="margin-bottom: 18px; width: 56px; height: 56px;">
+              <svg viewBox="0 0 64 64" width="56" height="56" fill="none" aria-hidden="true">
+                <circle cx="28" cy="28" r="22" stroke="#FFC21A" stroke-width="4.5" />
+                <circle cx="32" cy="32" r="22" stroke="#FFE28A" stroke-width="4.5" stroke-dasharray="6 4" />
+                <circle cx="36" cy="36" r="22" stroke="#FFC21A" stroke-width="4.5" />
+              </svg>
+            </div>
+            <h3 style="color: var(--color-marigold); font-size: 22px; margin-bottom: 12px; line-height: 1.3;">
+              ${t("promise.1.title")}
+            </h3>
+            <p style="color: var(--color-cream); font-size: 16px; opacity: 0.95; line-height: 1.55;">
+              ${t("promise.1.desc")}
+            </p>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 36px; padding-top: 24px;">
-            ${profiles
-              .map(
-                (p, idx) => {
-                  const sceneSlot = p.id === "sunita" ? "scene-tailor" : p.id === "priya" ? "scene-scholar" : "scene-learner";
-                  return `
-              <div class="note fade-up" style="transform: rotate(${idx % 2 === 0 ? '-1.5deg' : '1.5deg'}); padding-top: 20px;">
-                <!-- Illustration breakout over card edge -->
-                <div style="margin: -40px -10px 10px -10px; max-height: 220px; overflow: visible;">
-                  ${window.ART ? window.ART.slot(sceneSlot, p.name, "woman-scene-slot") : ""}
-                </div>
+          <!-- Promise 2 -->
+          <div class="fade-up" style="border: 2px solid rgba(255, 246, 229, 0.4); border-radius: 24px; padding: 32px 28px; background: rgba(10, 47, 33, 0.5);">
+            <div style="margin-bottom: 18px; width: 56px; height: 56px;">
+              <svg viewBox="0 0 64 64" width="56" height="56" fill="none" aria-hidden="true">
+                <circle cx="28" cy="28" r="22" stroke="#FFC21A" stroke-width="4.5" />
+                <circle cx="32" cy="32" r="22" stroke="#FFE28A" stroke-width="4.5" stroke-dasharray="6 4" />
+                <circle cx="36" cy="36" r="22" stroke="#FFC21A" stroke-width="4.5" />
+              </svg>
+            </div>
+            <h3 style="color: var(--color-marigold); font-size: 22px; margin-bottom: 12px; line-height: 1.3;">
+              ${t("promise.2.title")}
+            </h3>
+            <p style="color: var(--color-cream); font-size: 16px; opacity: 0.95; line-height: 1.55;">
+              ${t("promise.2.desc")}
+            </p>
+          </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                  <h3 style="font-size:24px; color: var(--color-forest);">${escapeHtml(p.name)}</h3>
-                  <span class="tag">${escapeHtml(p.location)}</span>
-                </div>
-                <p style="font-size:16px; margin-bottom: 16px;">
-                  <strong>${escapeHtml(p.educationLabel)}</strong><br>
-                  ${escapeHtml(p.story)}
-                </p>
-                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 20px;">
-                  ${p.skills.map(s => `<span class="chip" style="font-size:14px; padding:4px 10px;">${escapeHtml(s)}</span>`).join("")}
-                </div>
-                <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('${p.id}')">
-                  ${t("btn.quick_profile")}: ${escapeHtml(p.name)} &rarr;
-                </button>
-              </div>
-            `;
-                }
-              )
-              .join("")}
+          <!-- Promise 3 -->
+          <div class="fade-up" style="border: 2px solid rgba(255, 246, 229, 0.4); border-radius: 24px; padding: 32px 28px; background: rgba(10, 47, 33, 0.5);">
+            <div style="margin-bottom: 18px; width: 56px; height: 56px;">
+              <svg viewBox="0 0 64 64" width="56" height="56" fill="none" aria-hidden="true">
+                <circle cx="28" cy="28" r="22" stroke="#FFC21A" stroke-width="4.5" />
+                <circle cx="32" cy="32" r="22" stroke="#FFE28A" stroke-width="4.5" stroke-dasharray="6 4" />
+                <circle cx="36" cy="36" r="22" stroke="#FFC21A" stroke-width="4.5" />
+              </svg>
+            </div>
+            <h3 style="color: var(--color-marigold); font-size: 22px; margin-bottom: 12px; line-height: 1.3;">
+              ${t("promise.3.title")}
+            </h3>
+            <p style="color: var(--color-cream); font-size: 16px; opacity: 0.95; line-height: 1.55;">
+              ${t("promise.3.desc")}
+            </p>
           </div>
         </div>
       </section>
 
-      <!-- Promise Section (Blush) -->
-      <section class="section section-blush">
-        <div class="container">
-          <div class="layout-7-5">
-            <div class="fade-up">
-              <span class="tag tag--support" style="margin-bottom: 16px;">${t("tagline.sakhi")}</span>
-              <h2 style="margin-bottom: 20px; color: var(--color-deep-forest);">${t("tagline.promise")}</h2>
-              <p style="font-size: 20px; margin-bottom: 24px; line-height: 1.6;">
-                ${t("notice.privacy")}
-              </p>
-              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <span class="chip active">&bull; No Aadhaar needed</span>
-                <span class="chip active">&bull; No phone number</span>
-                <span class="chip active">&bull; 100% On-device storage</span>
-              </div>
+      <!-- ================= SECTION 6: A NOTE FROM THE MAKER (Cream) ================= -->
+      <section class="section section-cream" style="padding-top: 72px; padding-bottom: 80px;">
+        <div class="container text-center">
+          <!-- REMINDER: Replace this with 2 lines in your own words: why you built ReturnHer. -->
+          <div class="note note--maker fade-up" style="max-width: 680px; margin: 0 auto; text-align: left; padding: 40px 32px 32px; background: #FFFDF4; border: 2px solid #D8CEB9; border-radius: 12px; position: relative;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+              <span class="tag tag--support">${t("tagline.sakhi")}</span>
+              <span>${window.ART ? window.ART.decor("marigold", { size: 36 }) : ""}</span>
             </div>
-            <div class="card shape-leaf card--forest fade-up" style="padding: 24px; text-align: center;">
-              <div style="max-width: 200px; margin: 0 auto 16px;">
-                ${window.ART ? window.ART.slot("sakhi", "Sakhi, your friendly guide waving in a marigold dupatta", "sakhi-avatar-slot") : ""}
+            <h3 style="font-size: 26px; color: var(--color-forest); margin-bottom: 16px;">${t("maker.title")}</h3>
+            <p style="font-size: 20px; font-style: italic; color: var(--color-ink); line-height: 1.6; margin-bottom: 24px;">
+              "${t("maker.placeholder")}"
+            </p>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+              <div>
+                <strong style="font-family: var(--font-heading); font-size: 19px; color: var(--color-forest); display:block;">ReturnHer Team</strong>
+                <span style="font-size: 15px; color: #555;">${t("maker.signoff")}</span>
               </div>
-              <h4 style="margin-bottom: 10px; color: var(--color-marigold);">${t("tagline.sakhi")}</h4>
-              <p style="font-size: 15px; line-height: 1.5; color: var(--color-cream); margin-bottom: 16px;">
-                ${t("notice.prototype")}
-              </p>
-              <a href="#/explore" class="btn btn-sm btn-on-dark">${t("btn.explore")}</a>
+              <span>${window.ART ? window.ART.decor("paisley", { size: 38 }) : ""}</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- CTA Section (Marigold) with Framed Textile Panel -->
-      <section class="section section-marigold">
-        <div class="container text-center" style="max-width: 900px; margin: 0 auto;">
-          <div style="margin-bottom: 32px; max-width: 760px; margin-left: auto; margin-right: auto;">
-            ${window.ART ? window.ART.slot("cta-panel", "Textile panel with festive marigolds and paisleys", "cta-panel-decor") : ""}
+      <!-- ================= SECTION 7: FINAL CTA (Marigold) ================= -->
+      <section class="section section-marigold" style="padding-top: 56px; padding-bottom: 80px; overflow: visible;">
+        <div class="container" style="position: relative; overflow: visible;">
+          <!-- Wide ART.panel() whose shapes bleed onto marigold -->
+          <div class="cta-panel-wrap fade-up" style="max-width: 1100px; margin: 0 auto; overflow: visible; line-height: 0;">
+            ${window.ART ? window.ART.panel() : ""}
           </div>
-          <h2 class="fade-up" style="margin-bottom: 16px; color: var(--color-forest);">
-            ${t("tagline.cta")}
-          </h2>
-          <p class="fade-up" style="font-size: 22px; color: var(--color-ink); margin-bottom: 32px;">
-            ${t("tagline.cta-sub")}
-          </p>
-          <a href="#/start" class="btn btn-primary fade-up" style="font-size: 20px; padding: 18px 40px;">
-            ${t("btn.begin")} ${ICONS.arrowRight}
-          </a>
+
+          <!-- Off-centre cream rounded card overlapping panel -->
+          <div class="card shape-arch cta-overlay-card block-behind block-behind--forest fade-up" style="background-color: var(--color-cream); padding: 44px 36px; text-align: center; border: 2.5px solid var(--color-ink); max-width: 640px; margin-left: auto; margin-right: auto;">
+            <div style="display:inline-block; margin-bottom: 12px;">
+              ${window.ART ? window.ART.decor("marigold", { size: 40 }) : ""}
+            </div>
+            <h2 style="font-size: clamp(32px, 4.5vw, 46px); color: var(--color-forest); margin-bottom: 14px;">
+              ${t("tagline.cta")}
+            </h2>
+            <p style="font-size: 20px; color: var(--color-ink); margin-bottom: 28px; line-height: 1.5;">
+              ${t("tagline.cta-sub")}
+            </p>
+            <a href="#/start" class="btn btn-primary" style="font-size: 20px; padding: 16px 36px;">
+              ${t("hero.btn_path")} &rarr;
+            </a>
+          </div>
         </div>
       </section>
     `;
@@ -672,107 +894,355 @@
     `;
   }
 
-  // 4. Start / Onboarding View (#/start)
-  function renderStart() {
-    const app = document.getElementById("app-view");
-    const profile = Storage.getProfile() || {
-      name: "",
-      education: "class10",
-      skills: "",
-      goal: "learn-skill",
-      district: "",
-      state: "Uttar Pradesh"
+  const wizardGoals = [
+    { id: "finish-education", label: "wizard.goal.education", icon: "rangoli" },
+    { id: "research-phd", label: "wizard.goal.research", icon: "paisley" },
+    { id: "learn-skill", label: "wizard.goal.skill", icon: "rangoli" },
+    { id: "certify-skill", label: "wizard.goal.certify", icon: "bangles" },
+    { id: "teach-others", label: "wizard.goal.teach", icon: "lotus" },
+    { id: "find-government-job", label: "wizard.goal.job", icon: "sun" },
+    { id: "earn-from-home", label: "wizard.goal.earn", icon: "leaf" },
+    { id: "start-business", label: "wizard.goal.business", icon: "sun" }
+  ];
+  const wizardSkills = [
+    "tailoring", "embroidery", "cooking", "teaching", "beauty-wellness",
+    "computer-basics", "handicrafts", "design", "other"
+  ];
+  const wizardStates = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+    "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
+    "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+    "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+    "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+  ];
+  const wizardSteps = [
+    { title: "wizard.goal.title", subtitle: "wizard.goal.subtitle", background: "marigold", scene: "entrepreneur" },
+    { title: "wizard.education.title", subtitle: "wizard.education.subtitle", background: "blush", scene: "learner" },
+    { title: "wizard.skills.title", subtitle: "wizard.skills.subtitle", background: "oat", scene: "tailor" },
+    { title: "wizard.location.title", subtitle: "wizard.location.subtitle", background: "cream", scene: "doorway" },
+    { title: "wizard.learning.title", subtitle: "wizard.learning.subtitle", background: "marigold", scene: "teacher" }
+  ];
+  const wizardEducation = ["class10", "class12", "graduate", "postgraduate"];
+  const wizardDistricts = ["Lucknow", "Kanpur", "Meerut", "Varanasi", "Prayagraj", "Agra", "Gorakhpur"];
+
+  function createOnboardingDraft(profile = {}) {
+    const rawSkills = Array.isArray(profile.skills)
+      ? profile.skills.map(skill => String(skill).trim()).filter(Boolean)
+      : String(profile.skills || "").split(",").map(skill => skill.trim()).filter(Boolean);
+    const skillAliases = {
+      tailoring: ["tailor", "sew"],
+      embroidery: ["embroider"],
+      cooking: ["cook"],
+      teaching: ["teach", "trainer"],
+      "beauty-wellness": ["beauty", "wellness"],
+      "computer-basics": ["computer", "digital"],
+      handicrafts: ["handicraft", "craft"],
+      design: ["design"]
     };
+    const skills = wizardSkills.filter(skill =>
+      skill === "other"
+        ? rawSkills.some(value => !Object.values(skillAliases).some(aliases =>
+          aliases.some(alias => value.toLowerCase().includes(alias))
+        ))
+        : rawSkills.some(value => skillAliases[skill].some(alias => value.toLowerCase().includes(alias)))
+    );
+    const goal = Array.isArray(profile.goals) ? profile.goals[0] : profile.goal;
+    const experienceYears = Number(profile.experienceYears);
+    const experienceRange = profile.experienceRange || (
+      experienceYears >= 10 ? "10+" :
+        experienceYears >= 5 ? "5-9" :
+          experienceYears >= 2 ? "2-4" :
+            experienceYears >= 0 && profile.experienceYears !== undefined ? "0-1" : ""
+    );
+
+    return {
+      name: profile.name || "",
+      goal: wizardGoals.some(option => option.id === goal) ? goal : "",
+      education: wizardEducation.includes(profile.education) ? profile.education : "class10",
+      skills,
+      otherSkillText: rawSkills.filter(value =>
+        !Object.values(skillAliases).some(aliases => aliases.some(alias => value.toLowerCase().includes(alias)))
+      ).join(", "),
+      experienceRange,
+      state: profile.state || "Uttar Pradesh",
+      district: profile.district || "",
+      mode: profile.mode === "offline" ? "in-person" : profile.mode === "online" ? "online" : "either",
+      financialSupportNeeded: Boolean(profile.financialSupportNeeded)
+    };
+  }
+
+  function wizardOptionButton(group, value, label, icon, selected, multi = false) {
+    const iconSvg = window.ART ? window.ART.decor(icon, { size: 32 }) : "";
+    const bloom = selected && window.ART ? window.ART.decor("marigold", { size: 24 }) : "";
+    const attribute = group === "skill" ? "data-skill" : `data-${group}`;
+    return `
+      <button type="button" class="wizard-option${selected ? " is-selected" : ""}" ${attribute}="${escapeHtml(value)}"
+        aria-pressed="${selected}" ${multi ? 'aria-label="' + escapeHtml(label) + '"' : ""}>
+        <span class="wizard-option-icon">${iconSvg}</span>
+        <span class="wizard-option-label">${escapeHtml(label)}</span>
+        ${bloom ? `<span class="wizard-option-bloom" aria-hidden="true">${bloom}</span>` : ""}
+      </button>
+    `;
+  }
+
+  function renderWizardProgress(step) {
+    const stops = [
+      { x: 10, y: 27 }, { x: 72, y: 16 }, { x: 151, y: 29 },
+      { x: 225, y: 15 }, { x: 290, y: 25 }
+    ];
+    const marker = stops[Math.min(step, stops.length - 1)];
+    return `
+      <div class="wizard-progress" role="img" aria-label="${escapeHtml(t("wizard.progress", "{step} of 5").replace("{step}", String(Math.min(step + 1, 5))))}">
+        <svg viewBox="0 0 300 48" aria-hidden="true">
+          <path d="M10 27 C34 3 52 6 72 16 S122 47 151 29 S201 -2 225 15 S266 44 290 25" class="wizard-progress-path"/>
+          ${stops.map((stop, index) => `<circle cx="${stop.x}" cy="${stop.y}" r="5" class="wizard-progress-dot${index <= step ? " is-travelled" : ""}"/>`).join("")}
+        </svg>
+        <span class="wizard-progress-marker" style="left:${marker.x / 3}%; top:${marker.y / 48 * 100}%;" aria-hidden="true">
+          ${window.ART ? window.ART.decor("marigold", { size: 24 }) : ""}
+        </span>
+      </div>
+    `;
+  }
+
+  function renderStart(direction = onboardingDirection) {
+    const app = document.getElementById("app-view");
+    onboardingDirection = direction;
+    window.scrollTo({ top: 0, behavior: "instant" });
+    if (!onboardingDraft) {
+      onboardingDraft = createOnboardingDraft(Storage.getProfile() || {});
+    }
+
+    const isSummary = onboardingStep >= wizardSteps.length;
+    const currentStep = Math.min(onboardingStep, wizardSteps.length - 1);
+    const step = wizardSteps[currentStep];
+    const title = isSummary ? "wizard.summary.title" : step.title;
+    const subtitle = isSummary ? "wizard.summary.subtitle" : step.subtitle;
+    const background = isSummary ? wizardSteps[wizardSteps.length - 1].background : step.background;
+    const scene = isSummary ? "scholar" : step.scene;
+    const goalLabel = wizardGoals.find(option => option.id === onboardingDraft.goal);
+    const selectedSkills = onboardingDraft.skills.map(skill => t(`wizard.skill.${skill}`));
+    if (onboardingDraft.otherSkillText && onboardingDraft.skills.includes("other")) {
+      selectedSkills.push(onboardingDraft.otherSkillText);
+    }
+    const experienceLabels = { "0-1": "wizard.experience.0-1", "2-4": "wizard.experience.2-4", "5-9": "wizard.experience.5-9", "10+": "wizard.experience.10+" };
+    const modeLabels = { online: "wizard.learning.online", "in-person": "wizard.learning.inPerson", either: "wizard.learning.either" };
+
+    let questionContent = "";
+    if (!isSummary && currentStep === 0) {
+      questionContent = `<div class="wizard-options wizard-options--goals">${wizardGoals.map(option =>
+        wizardOptionButton("goal", option.id, t(option.label), option.icon, onboardingDraft.goal === option.id)
+      ).join("")}</div>`;
+    } else if (!isSummary && currentStep === 1) {
+      questionContent = `
+        <div class="wizard-options wizard-options--compact">
+          ${wizardEducation.map((value, index) => wizardOptionButton("education", value,
+            t(`wizard.education.${value}`), ["books", "rangoli", "paisley", "lotus"][index],
+            onboardingDraft.education === value
+          )).join("")}
+        </div>
+        <p class="wizard-inline-note">${t("wizard.education.welcome")}</p>
+      `;
+    } else if (!isSummary && currentStep === 2) {
+      questionContent = `
+        <div class="wizard-options wizard-options--skills">
+          ${wizardSkills.map((value, index) => wizardOptionButton("skill", value,
+            t(`wizard.skill.${value}`), ["bangles", "rangoli", "sun", "lotus", "paisley", "dots", "leaf", "squiggle", "marigold"][index],
+            onboardingDraft.skills.includes(value), true
+          )).join("")}
+        </div>
+        ${onboardingDraft.skills.includes("other") ? `
+          <label class="wizard-field-label" for="wizard-other-skill">${t("wizard.skills.otherPrompt")}</label>
+          <input class="wizard-input" id="wizard-other-skill" type="text" value="${escapeHtml(onboardingDraft.otherSkillText)}" placeholder="${escapeHtml(t("wizard.skills.otherPlaceholder"))}">
+        ` : ""}
+        <label class="wizard-field-label" for="wizard-experience">${t("wizard.experience.label")}</label>
+        <select class="wizard-input" id="wizard-experience">
+          <option value="">${t("wizard.experience.skip")}</option>
+          ${Object.entries(experienceLabels).map(([value, key]) =>
+            `<option value="${value}" ${onboardingDraft.experienceRange === value ? "selected" : ""}>${t(key)}</option>`
+          ).join("")}
+        </select>
+      `;
+    } else if (!isSummary && currentStep === 3) {
+      questionContent = `
+        <div class="wizard-field">
+          <label class="wizard-field-label" for="wizard-state">${t("wizard.location.state")}</label>
+          <select class="wizard-input" id="wizard-state">
+            ${wizardStates.map(state => `<option value="${escapeHtml(state)}" ${onboardingDraft.state === state ? "selected" : ""}>${escapeHtml(state)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="wizard-field">
+          <label class="wizard-field-label" for="wizard-district">${t("wizard.location.district")}</label>
+          <input class="wizard-input" id="wizard-district" type="text" list="wizard-district-options" value="${escapeHtml(onboardingDraft.district)}" placeholder="${escapeHtml(t("wizard.location.districtPlaceholder"))}">
+          <datalist id="wizard-district-options">${wizardDistricts.map(district => `<option value="${district}"></option>`).join("")}</datalist>
+        </div>
+        <p class="wizard-inline-note">${t("wizard.location.note")}</p>
+      `;
+    } else if (!isSummary && currentStep === 4) {
+      questionContent = `
+        <fieldset class="wizard-choice-group">
+          <legend class="wizard-field-label">${t("wizard.learning.question")}</legend>
+          <div class="wizard-options wizard-options--compact">
+            ${[
+              ["online", "wizard.learning.online", "sun"],
+              ["in-person", "wizard.learning.inPerson", "leaf"],
+              ["either", "wizard.learning.either", "rangoli"]
+            ].map(([value, label, icon]) => wizardOptionButton("mode", value, t(label), icon, onboardingDraft.mode === value)).join("")}
+          </div>
+        </fieldset>
+        <fieldset class="wizard-choice-group">
+          <legend class="wizard-field-label">${t("wizard.learning.supportQuestion")}</legend>
+          <div class="wizard-options wizard-options--compact">
+            ${[
+              ["yes", "wizard.learning.yes", "marigold"],
+              ["no", "wizard.learning.notNecessary", "bangles"]
+            ].map(([value, label, icon]) => wizardOptionButton("support", value, t(label), icon, onboardingDraft.financialSupportNeeded === (value === "yes"))).join("")}
+          </div>
+        </fieldset>
+      `;
+    } else {
+      questionContent = `
+        <div class="journey-ticket">
+          <div class="journey-ticket-heading">
+            <span class="tag tag--support">${t("wizard.ticket.label")}</span>
+            ${window.ART ? window.ART.decor("marigold", { size: 36 }) : ""}
+          </div>
+          <div class="journey-ticket-line">
+            <span><strong>${t("wizard.ticket.from")}</strong> ${t(`wizard.education.${onboardingDraft.education}`)}</span>
+            <button type="button" class="wizard-edit-link" data-edit-step="1">${t("wizard.edit")}</button>
+          </div>
+          <div class="journey-ticket-line">
+            <span><strong>${t("wizard.ticket.district")}</strong> ${escapeHtml(onboardingDraft.district || t("wizard.ticket.notSet"))}</span>
+            <button type="button" class="wizard-edit-link" data-edit-step="3">${t("wizard.edit")}</button>
+          </div>
+          <div class="journey-ticket-line">
+            <span><strong>${t("wizard.ticket.goal")}</strong> ${goalLabel ? t(goalLabel.label) : t("wizard.ticket.notSet")}</span>
+            <button type="button" class="wizard-edit-link" data-edit-step="0">${t("wizard.edit")}</button>
+          </div>
+          <div class="journey-ticket-line">
+            <span><strong>${t("wizard.ticket.skills")}</strong> ${selectedSkills.length ? selectedSkills.map(escapeHtml).join(", ") : t("wizard.ticket.none")}</span>
+            <button type="button" class="wizard-edit-link" data-edit-step="2">${t("wizard.edit")}</button>
+          </div>
+          <div class="journey-ticket-line">
+            <span><strong>${t("wizard.ticket.learning")}</strong> ${t(modeLabels[onboardingDraft.mode])}</span>
+            <button type="button" class="wizard-edit-link" data-edit-step="4">${t("wizard.edit")}</button>
+          </div>
+          <div class="journey-ticket-line">
+            <span><strong>${t("wizard.ticket.support")}</strong> ${t(onboardingDraft.financialSupportNeeded ? "wizard.learning.yes" : "wizard.learning.notNecessary")}</span>
+            <button type="button" class="wizard-edit-link" data-edit-step="4">${t("wizard.edit")}</button>
+          </div>
+          <p class="wizard-ticket-note">${t("wizard.summary.note")}</p>
+        </div>
+      `;
+    }
 
     app.innerHTML = `
-      <section class="section section-cream">
-        <div class="container" style="max-width: 800px;">
-          <div class="text-center" style="margin-bottom: 36px;">
-            <span class="tag tag--support" style="margin-bottom: 12px;">${t("tagline.sakhi")}</span>
-            <h1>${t("route.start.title")}</h1>
-            <p style="font-size: 20px; color: var(--color-ink); margin-top: 12px;">${t("route.start.desc")}</p>
+      <section class="journey-wizard journey-wizard--${background}">
+        <div class="wizard-figure" aria-hidden="true">${window.ART ? window.ART.scene(scene) : ""}</div>
+        <div class="container wizard-container">
+          <div class="wizard-heading">
+            <span class="tag tag--support">${t("tagline.sakhi")}</span>
+            <h2>${t(title)}</h2>
+            <p>${t(subtitle)}</p>
+            <p class="wizard-purpose">${t("route.home.subtitle")}</p>
           </div>
-
-          <div class="card shape-arch block-behind block-behind--forest fade-up" style="padding: 40px;">
-            <form id="onboarding-form">
-              <div style="margin-bottom: 24px;">
-                <label for="form-name" style="display:block; font-weight:700; margin-bottom:8px;">First Name</label>
-                <input id="form-name" type="text" value="${escapeHtml(profile.name)}" placeholder="e.g. Sunita" required style="width:100%; padding:14px; border:2px solid var(--color-ink); border-radius:12px; font-size:18px; font-family:inherit;">
-              </div>
-
-              <div style="margin-bottom: 24px;">
-                <label for="form-education" style="display:block; font-weight:700; margin-bottom:8px;">${t("route.start.step1")}</label>
-                <select id="form-education" style="width:100%; padding:14px; border:2px solid var(--color-ink); border-radius:12px; font-size:18px; font-family:inherit; background:#fff;">
-                  <option value="class10" ${profile.education === 'class10' ? 'selected' : ''}>Class 10 (Secondary)</option>
-                  <option value="class12" ${profile.education === 'class12' ? 'selected' : ''}>Class 12 (Senior Secondary)</option>
-                  <option value="graduate" ${profile.education === 'graduate' ? 'selected' : ''}>Graduate / Bachelor's Degree</option>
-                  <option value="postgraduate" ${profile.education === 'postgraduate' ? 'selected' : ''}>Postgraduate / Master's Degree</option>
-                </select>
-              </div>
-
-              <div style="margin-bottom: 24px;">
-                <label for="form-skills" style="display:block; font-weight:700; margin-bottom:8px;">${t("route.start.step2")}</label>
-                <input id="form-skills" type="text" value="${escapeHtml(Array.isArray(profile.skills) ? profile.skills.join(', ') : profile.skills || '')}" placeholder="e.g. tailoring, embroidery, computers, teaching" style="width:100%; padding:14px; border:2px solid var(--color-ink); border-radius:12px; font-size:18px; font-family:inherit;">
-              </div>
-
-              <div style="margin-bottom: 24px;">
-                <label for="form-goal" style="display:block; font-weight:700; margin-bottom:8px;">${t("route.start.step3")}</label>
-                <select id="form-goal" style="width:100%; padding:14px; border:2px solid var(--color-ink); border-radius:12px; font-size:18px; font-family:inherit; background:#fff;">
-                  <option value="learn-skill" ${profile.goal === 'learn-skill' ? 'selected' : ''}>Learn a new craft or trade</option>
-                  <option value="certify-skill" ${profile.goal === 'certify-skill' ? 'selected' : ''}>Get certified for skills I already know</option>
-                  <option value="finish-education" ${profile.goal === 'finish-education' ? 'selected' : ''}>Complete my degree or schooling</option>
-                  <option value="research-phd" ${profile.goal === 'research-phd' ? 'selected' : ''}>Pursue PhD / Research with fellowship</option>
-                  <option value="teach-others" ${profile.goal === 'teach-others' ? 'selected' : ''}>Teach others / Become a trainer</option>
-                  <option value="start-business" ${profile.goal === 'start-business' ? 'selected' : ''}>Start a small business / workshop</option>
-                  <option value="earn-from-home" ${profile.goal === 'earn-from-home' ? 'selected' : ''}>Earn flexibly from home</option>
-                </select>
-              </div>
-
-              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom: 32px;">
-                <div>
-                  <label for="form-district" style="display:block; font-weight:700; margin-bottom:8px;">District</label>
-                  <input id="form-district" type="text" value="${escapeHtml(profile.district || '')}" placeholder="e.g. Meerut, Lucknow" style="width:100%; padding:14px; border:2px solid var(--color-ink); border-radius:12px; font-size:18px; font-family:inherit;">
-                </div>
-                <div>
-                  <label for="form-state" style="display:block; font-weight:700; margin-bottom:8px;">State</label>
-                  <input id="form-state" type="text" value="${escapeHtml(profile.state || 'Uttar Pradesh')}" placeholder="e.g. Uttar Pradesh" style="width:100%; padding:14px; border:2px solid var(--color-ink); border-radius:12px; font-size:18px; font-family:inherit;">
-                </div>
-              </div>
-
-              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-                <button type="submit" class="btn btn-primary" style="padding:16px 36px; font-size:20px;">
-                  Map My Pathway ${ICONS.arrowRight}
-                </button>
-                <div style="display:flex; gap:8px;">
-                  <button type="button" class="btn btn-sm btn-outline" onclick="window.loadDemoProfile('sunita')">Try Sunita</button>
-                  <button type="button" class="btn btn-sm btn-outline" onclick="window.loadDemoProfile('priya')">Try Priya</button>
-                  <button type="button" class="btn btn-sm btn-outline" onclick="window.loadDemoProfile('anjali')">Try Anjali</button>
-                </div>
-              </div>
-            </form>
+          ${renderWizardProgress(currentStep)}
+          <div class="wizard-panel wizard-enter-${direction}">
+            ${questionContent}
+            <p class="wizard-error" id="wizard-error" role="status" aria-live="polite"></p>
+            <div class="wizard-actions">
+              <button type="button" class="btn btn-outline wizard-back">${t("btn.back")}</button>
+              ${isSummary
+                ? `<button type="button" class="btn btn-primary wizard-build">${t("wizard.build")} ${ICONS.arrowRight}</button>`
+                : `<button type="button" class="btn btn-primary wizard-next">${t("wizard.next")} ${ICONS.arrowRight}</button>`}
+            </div>
           </div>
+          <p class="wizard-privacy">${t("notice.privacy")}</p>
         </div>
       </section>
     `;
 
-    const form = document.getElementById("onboarding-form");
-    if (form) {
-      form.addEventListener("submit", e => {
-        e.preventDefault();
-        const updatedProfile = {
-          name: document.getElementById("form-name").value.trim(),
-          education: document.getElementById("form-education").value,
-          skills: document.getElementById("form-skills").value.split(",").map(s => s.trim()).filter(Boolean),
-          goal: document.getElementById("form-goal").value,
-          district: document.getElementById("form-district").value.trim(),
-          state: document.getElementById("form-state").value.trim()
-        };
-        Storage.saveProfile(updatedProfile);
-        showToast(t("toast.profile_loaded"));
-        renderNavbar();
-        window.location.hash = "#/path";
+    app.querySelectorAll("[data-goal]").forEach(button => button.addEventListener("click", () => {
+      onboardingDraft.goal = button.dataset.goal;
+      renderStart(direction);
+    }));
+    app.querySelectorAll("[data-education]").forEach(button => button.addEventListener("click", () => {
+      onboardingDraft.education = button.dataset.education;
+      renderStart(direction);
+    }));
+    app.querySelectorAll("[data-skill]").forEach(button => button.addEventListener("click", () => {
+      const skill = button.dataset.skill;
+      onboardingDraft.skills = onboardingDraft.skills.includes(skill)
+        ? onboardingDraft.skills.filter(value => value !== skill)
+        : [...onboardingDraft.skills, skill];
+      renderStart("next");
+    }));
+    app.querySelectorAll("[data-mode]").forEach(button => button.addEventListener("click", () => {
+      onboardingDraft.mode = button.dataset.mode;
+      renderStart(direction);
+    }));
+    app.querySelectorAll("[data-support]").forEach(button => button.addEventListener("click", () => {
+      onboardingDraft.financialSupportNeeded = button.dataset.support === "yes";
+      renderStart(direction);
+    }));
+    app.querySelectorAll("[data-edit-step]").forEach(button => button.addEventListener("click", () => {
+      onboardingStep = Number(button.dataset.editStep);
+      renderStart("back");
+    }));
+
+    const stateInput = app.querySelector("#wizard-state");
+    const districtInput = app.querySelector("#wizard-district");
+    const experienceInput = app.querySelector("#wizard-experience");
+    const otherSkillInput = app.querySelector("#wizard-other-skill");
+    if (stateInput) stateInput.addEventListener("change", () => { onboardingDraft.state = stateInput.value; });
+    if (districtInput) districtInput.addEventListener("input", () => { onboardingDraft.district = districtInput.value; });
+    if (experienceInput) experienceInput.addEventListener("change", () => { onboardingDraft.experienceRange = experienceInput.value; });
+    if (otherSkillInput) otherSkillInput.addEventListener("input", () => { onboardingDraft.otherSkillText = otherSkillInput.value; });
+
+    app.querySelector(".wizard-back").addEventListener("click", () => {
+      if (onboardingStep === 0) {
+        window.location.hash = "#/signin";
+        return;
+      }
+      onboardingStep -= 1;
+      renderStart("back");
+    });
+
+    const nextButton = app.querySelector(".wizard-next");
+    if (nextButton) nextButton.addEventListener("click", () => {
+      if (onboardingStep === 0 && !onboardingDraft.goal) {
+        const error = app.querySelector("#wizard-error");
+        error.textContent = t("wizard.goal.required");
+        error.classList.add("is-visible");
+        return;
+      }
+      onboardingStep += 1;
+      renderStart("next");
+    });
+
+    const buildButton = app.querySelector(".wizard-build");
+    if (buildButton) buildButton.addEventListener("click", () => {
+      const skills = onboardingDraft.skills
+        .filter(skill => skill !== "other")
+        .concat(onboardingDraft.otherSkillText.split(",").map(skill => skill.trim()).filter(Boolean));
+      const experienceYears = { "0-1": 0, "2-4": 3, "5-9": 5, "10+": 10 }[onboardingDraft.experienceRange];
+      Storage.saveProfile({
+        name: onboardingDraft.name.trim(),
+        education: onboardingDraft.education,
+        skills,
+        goal: onboardingDraft.goal,
+        district: onboardingDraft.district.trim(),
+        state: onboardingDraft.state,
+        location: onboardingDraft.district.trim(),
+        experienceRange: onboardingDraft.experienceRange,
+        ...(experienceYears === undefined ? {} : { experienceYears }),
+        mode: onboardingDraft.mode === "in-person" ? "offline" : onboardingDraft.mode === "either" ? "both" : "online",
+        financialSupportNeeded: onboardingDraft.financialSupportNeeded
       });
-    }
+      showToast(t("wizard.saved"));
+      window.location.hash = "#/path";
+    });
   }
 
   // 5. Personal Pathway View (#/path)
@@ -794,11 +1264,32 @@
       return;
     }
 
-    // Match opportunities based on education or goal
+    const goalTags = profile.goal === "find-government-job" ? ["govt-job"] : [profile.goal];
+    const profileSkills = Array.isArray(profile.skills) ? profile.skills : [];
+    const skillKeywords = {
+      tailoring: ["tailoring", "sewing"],
+      embroidery: ["embroidery"],
+      cooking: ["cooking"],
+      teaching: ["teaching", "trainer"],
+      "beauty-wellness": ["beauty", "wellness"],
+      "computer-basics": ["computer", "digital"],
+      handicrafts: ["handicraft", "craft"],
+      design: ["design"]
+    };
+    const selectedGoal = wizardGoals.find(option => option.id === profile.goal);
+
+    // Match opportunities based on education, goal, and skills
     const matched = opps.filter(o => {
-      const matchGoal = o.goalTags && o.goalTags.includes(profile.goal);
+      const matchGoal = o.goalTags && o.goalTags.some(goal => goalTags.includes(goal));
       const matchEdu = o.minEducation === profile.education;
-      return matchGoal || matchEdu;
+      const matchSkill = (o.skillTags || []).some(tag => {
+        const normalizedTag = tag.toLowerCase();
+        return profileSkills.some(skill => {
+          const keywords = skillKeywords[skill] || [skill];
+          return keywords.some(keyword => normalizedTag.includes(keyword.toLowerCase()));
+        });
+      });
+      return matchGoal || matchEdu || matchSkill;
     });
 
     const displayOpps = matched.length > 0 ? matched : opps.slice(0, 4);
@@ -811,7 +1302,7 @@
               <span class="tag tag--support" style="margin-bottom: 12px;">${t("tagline.sakhi")}</span>
               <h1>${escapeHtml(profile.name)}'s ${t("route.path.title")}</h1>
               <p style="font-size: 20px; color: var(--color-ink); margin-top: 8px;">
-                ${escapeHtml(profile.district || profile.location || 'India')}, ${escapeHtml(profile.state || '')} &bull; Goal: ${escapeHtml(profile.goal)}
+                ${escapeHtml(profile.district || profile.location || 'India')}, ${escapeHtml(profile.state || '')} &bull; Goal: ${selectedGoal ? t(selectedGoal.label) : escapeHtml(profile.goal)}
               </p>
             </div>
             <a href="#/start" class="btn btn-sm btn-outline">Update Profile</a>
@@ -1315,42 +1806,77 @@
   function renderSignin() {
     const app = document.getElementById("app-view");
     const profiles = window.PROFILES || [];
+    const sampleScenes = { sunita: "tailor", priya: "scholar", anjali: "learner" };
+    const profileName = (Storage.getProfile() || {}).name || "";
 
     app.innerHTML = `
-      <section class="section section-cream">
-        <div class="container" style="max-width: 800px;">
-          <div class="text-center" style="margin-bottom: 36px;">
-            <span class="tag tag--support" style="margin-bottom: 12px;">${t("tagline.sakhi")}</span>
-            <h1>${t("route.signin.title")}</h1>
-            <p style="font-size: 20px; color: var(--color-ink); margin-top: 12px;">${t("route.signin.desc")}</p>
+      <section class="signin-layout">
+        <div class="signin-welcome">
+          <div class="signin-welcome-copy">
+            <span class="tag tag--opportunity">${t("tagline.short")}</span>
+            <h2>${t("signin.title")}</h2>
+            <p>${t("signin.intro")}</p>
           </div>
-
-          <div class="card shape-arch block-behind block-behind--forest fade-up" style="padding: 36px; margin-bottom: 36px;">
-            <h3 style="font-size: 22px; margin-bottom: 16px;">Quick Hackathon Demo Profiles:</h3>
-            <p style="font-size: 16px; margin-bottom: 20px;">Select any of the 3 real-world profiles from the brief to demo personalized pathways:</p>
-
-            <div style="display:flex; flex-direction:column; gap:16px;">
-              ${profiles.map(p => `
-                <div style="border: 2px solid var(--color-ink); border-radius: 16px; padding: 20px; background: #fff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-                  <div>
-                    <h4 style="margin-bottom: 4px; font-size: 20px;">${escapeHtml(p.name)} (${escapeHtml(p.location)})</h4>
-                    <span style="font-size:15px; color:#555;">${escapeHtml(p.educationLabel)} &bull; Goal: ${escapeHtml(p.goals.join(', '))}</span>
-                  </div>
-                  <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('${p.id}')">
-                    Explore as ${escapeHtml(p.name)} &rarr;
-                  </button>
-                </div>
+          <div class="signin-arch-window" aria-hidden="true">
+            ${window.ART ? window.ART.scene("doorway") : ""}
+          </div>
+        </div>
+        <div class="signin-content">
+          <div class="signin-form-card">
+            <form id="signin-form" novalidate>
+              <div class="wizard-field">
+                <label class="wizard-field-label" for="signin-name">${t("signin.name")} <span aria-hidden="true">*</span></label>
+                <input class="wizard-input" id="signin-name" name="name" type="text" autocomplete="given-name" value="${escapeHtml(profileName)}" required>
+              </div>
+              <div class="wizard-field">
+                <label class="wizard-field-label" for="signin-email">${t("signin.nicknameEmail")}</label>
+                <input class="wizard-input" id="signin-email" name="nickname-or-email" type="text" autocomplete="email">
+              </div>
+              <p class="signin-validation" id="signin-validation" role="status" aria-live="polite"></p>
+              <button type="submit" class="btn btn-primary signin-continue">${t("signin.continue")} ${ICONS.arrowRight}</button>
+              <p class="signin-privacy">${t("notice.privacy")}</p>
+            </form>
+          </div>
+          <div class="signin-samples">
+            <h2>${t("signin.samples")}</h2>
+            <div class="signin-sample-list">
+              ${profiles.map(profile => `
+                <button type="button" class="signin-sample-chip" data-demo-profile="${escapeHtml(profile.id)}">
+                  <span class="signin-sample-avatar" aria-hidden="true">
+                    ${window.ART ? window.ART.scene(sampleScenes[profile.id] || "learner") : ""}
+                  </span>
+                  <span>${escapeHtml(profile.name)}</span>
+                </button>
               `).join("")}
             </div>
-          </div>
-
-          <div class="text-center">
-            <p style="margin-bottom: 16px;">Or prefer starting from scratch with your own story?</p>
-            <a href="#/start" class="btn btn-outline">${t("btn.start_onboarding")}</a>
+            <p class="signin-sample-note">${t("signin.sampleNote")}</p>
           </div>
         </div>
       </section>
     `;
+
+    const form = app.querySelector("#signin-form");
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const nameInput = app.querySelector("#signin-name");
+      const name = nameInput.value.trim();
+      const validation = app.querySelector("#signin-validation");
+      if (!name) {
+        validation.textContent = t("signin.nameRequired");
+        validation.classList.add("is-visible");
+        nameInput.focus();
+        return;
+      }
+
+      Storage.saveProfile({ name });
+      onboardingDraft = null;
+      onboardingStep = 0;
+      window.location.hash = "#/start";
+    });
+
+    app.querySelectorAll("[data-demo-profile]").forEach(button => button.addEventListener("click", () => {
+      window.loadDemoProfile(button.dataset.demoProfile);
+    }));
   }
 
   // --- Router Dispatcher ---
@@ -1399,8 +1925,11 @@
   // IntersectionObserver for gentle fade-up animations
   function initFadeUpObserver() {
     const fadeEls = document.querySelectorAll(".fade-up:not(.visible)");
+    const pathEls = document.querySelectorAll(".journey-path:not(.animated)");
+
     if (!("IntersectionObserver" in window)) {
       fadeEls.forEach(el => el.classList.add("visible"));
+      pathEls.forEach(el => el.classList.add("animated"));
       return;
     }
 
@@ -1409,6 +1938,13 @@
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add("visible");
+            if (entry.target.classList.contains("journey-path")) {
+              entry.target.classList.add("animated");
+            }
+            const nestedPath = entry.target.querySelector && entry.target.querySelector(".journey-path");
+            if (nestedPath) {
+              nestedPath.classList.add("animated");
+            }
             observer.unobserve(entry.target);
           }
         });
@@ -1417,6 +1953,7 @@
     );
 
     fadeEls.forEach(el => observer.observe(el));
+    pathEls.forEach(el => observer.observe(el));
   }
 
   // --- Global Handlers ---
@@ -1437,13 +1974,34 @@
         goal: found.goals[0] || "learn-skill",
         district: found.district,
         state: found.state,
-        location: found.location
+        location: found.location,
+        experienceYears: found.experienceYears,
+        mode: found.mode,
+        financialSupportNeeded: Boolean(found.financialSupportNeeded)
       });
+      onboardingDraft = null;
+      onboardingStep = 0;
       showToast(`${found.name}'s profile loaded!`);
       renderNavbar();
       window.location.hash = "#/path";
     }
   };
+
+  document.getElementById("app-view").addEventListener("click", event => {
+    const link = event.target instanceof Element
+      ? event.target.closest('a[href="#three-women"]')
+      : null;
+    if (!link) return;
+
+    event.preventDefault();
+    const section = document.getElementById("three-women");
+    if (section) {
+      section.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start"
+      });
+    }
+  });
 
   // Re-render when language changes
   window.addEventListener("languagechange", () => {
@@ -1458,4 +2016,3 @@
     router();
   });
 })();
-
