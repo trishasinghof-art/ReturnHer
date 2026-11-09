@@ -13,11 +13,16 @@
     PROFILE: "returnher_profile",
     SAVED_OPPORTUNITIES: "returnher_saved_opps",
     TRACKER_PROGRESS: "returnher_tracker",
-    APPLICATION_STAGES: "returnher_app_stages"
+    APPLICATION_STAGES: "returnher_app_stages",
+    APPLICATION_CHECKLISTS: "returnher_app_checklists"
   };
+  const SAKHI_HINT_KEY = "returnher_sakhi_hint_seen";
   let onboardingDraft = null;
   let onboardingStep = 0;
   let onboardingDirection = "next";
+  let sakhiOpen = false;
+  let sakhiTyping = false;
+  let sakhiMessages = [];
 
   // --- SVG Icons & Decorative Motifs (No 4-point sparkle star, no AI robot icons) ---
   const ICONS = {
@@ -59,6 +64,11 @@
     arrowRight: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <line x1="5" y1="12" x2="19" y2="12"></line>
       <polyline points="12 5 19 12 12 19"></polyline>
+    </svg>`,
+
+    speechBubble: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6.5A7.5 7.5 0 1 1 20 11.5Z"></path>
+      <path d="M8 11.5h8M8 14.5h5"></path>
     </svg>`,
 
     waveDivider: `<div class="divider" aria-hidden="true">
@@ -134,7 +144,42 @@
       try {
         localStorage.setItem(STORAGE_KEYS.TRACKER_PROGRESS, JSON.stringify(tracker));
       } catch (e) {
-        // ignore
+        console.warn("Could not save journey progress", e);
+      }
+    },
+    getApplicationStages() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.APPLICATION_STAGES) || "{}");
+      } catch (e) {
+        console.warn("Could not read application progress", e);
+        return {};
+      }
+    },
+    setApplicationStage(id, stage) {
+      const stages = this.getApplicationStages();
+      stages[id] = stage;
+      try {
+        localStorage.setItem(STORAGE_KEYS.APPLICATION_STAGES, JSON.stringify(stages));
+      } catch (e) {
+        console.warn("Could not save application progress", e);
+      }
+    },
+    getApplicationChecklist(id) {
+      try {
+        const checklists = JSON.parse(localStorage.getItem(STORAGE_KEYS.APPLICATION_CHECKLISTS) || "{}");
+        return Array.isArray(checklists[id]) ? checklists[id] : [];
+      } catch (e) {
+        console.warn("Could not read application checklist", e);
+        return [];
+      }
+    },
+    setApplicationChecklist(id, checked) {
+      try {
+        const checklists = JSON.parse(localStorage.getItem(STORAGE_KEYS.APPLICATION_CHECKLISTS) || "{}");
+        checklists[id] = checked;
+        localStorage.setItem(STORAGE_KEYS.APPLICATION_CHECKLISTS, JSON.stringify(checklists));
+      } catch (e) {
+        console.warn("Could not save application checklist", e);
       }
     }
   };
@@ -202,6 +247,15 @@
       .replace(/'/g, "&#039;");
   }
 
+  function pillarBlockClass(pillar) {
+    return {
+      education: "cobalt",
+      certification: "vermilion",
+      opportunity: "marigold",
+      support: "forest"
+    }[pillar] || "forest";
+  }
+
   // --- Shared Layout Renderers ---
   function renderPrototypeBanner() {
     const bannerEl = document.getElementById("prototype-banner");
@@ -211,6 +265,7 @@
       <p>
         <strong>${t("notice.prototype")}</strong> &bull; ${t("notice.privacy")}
       </p>
+      <button type="button" class="notice-guide-button" onclick="window.openDemoGuide()">${t("notice.demoGuide")}</button>
     `;
   }
 
@@ -220,12 +275,13 @@
     const currentHash = window.location.hash || "#/home";
     const profile = Storage.getProfile();
     const currentLang = window.I18N.getLanguage();
+    const savedCount = Storage.getSavedOpportunities().length;
 
     const isHome = currentHash === "#/home" || currentHash === "" || currentHash === "#" || currentHash === "#/";
     navEl.className = isHome ? "navbar navbar--hero" : "navbar";
 
     const authPill = profile
-      ? `<a href="#/me" class="navbar-profile btn btn-sm ${isHome ? 'btn-outline-dark' : 'btn-outline'}" aria-label="My journey: ${escapeHtml(profile.name)}" title="${escapeHtml(profile.name)}" style="border-radius: var(--radius-pill); font-size:15px;">
+      ? `<a href="#/me" class="navbar-profile btn btn-sm ${isHome ? 'btn-outline-dark' : 'btn-outline'}" aria-label="${t("nav.profileAria").replace("{name}", escapeHtml(profile.name))}" title="${escapeHtml(profile.name)}" style="border-radius: var(--radius-pill); font-size:15px;">
           <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--color-marigold); margin-right:4px;"></span>
           ${escapeHtml(profile.name)}
         </a>`
@@ -241,7 +297,7 @@
         <ul class="navbar-links" id="navbar-links-list">
           <li><a href="#/home" class="${currentHash.startsWith('#/home') || currentHash === '' ? 'active' : ''}">${t("nav.home")}</a></li>
           <li><a href="#/explore" class="${currentHash.startsWith('#/explore') ? 'active' : ''}">${t("nav.explore")}</a></li>
-          <li><a href="#/me" class="${currentHash.startsWith('#/me') ? 'active' : ''}">${t("nav.journey")}</a></li>
+          <li><a href="#/me" class="${currentHash.startsWith('#/me') ? 'active' : ''}">${t("nav.journey")}<span class="navbar-saved-count" aria-label="${t("explore.savedCount").replace("{count}", savedCount)}">${savedCount}</span></a></li>
           <li><a href="#/kit" class="${currentHash.startsWith('#/kit') ? 'active' : ''}">${t("nav.kit")}</a></li>
         </ul>
 
@@ -252,7 +308,7 @@
 
           ${authPill}
 
-          <button class="navbar-hamburger" id="navbar-hamburger-btn" aria-label="Toggle navigation">
+          <button class="navbar-hamburger" id="navbar-hamburger-btn" aria-label="${t("nav.toggleMenu")}">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
           </button>
         </div>
@@ -294,7 +350,7 @@
           </div>
 
           <ul class="footer-links">
-            <li><strong>Quick Links</strong></li>
+            <li><strong>${t("footer.quickLinks")}</strong></li>
             <li><a href="#/home">${t("nav.home")}</a></li>
             <li><a href="#/explore">${t("nav.explore")}</a></li>
             <li><a href="#/start">${t("btn.start_onboarding")}</a></li>
@@ -306,7 +362,7 @@
         <!-- Plain text official portal names per BRIEF.md -->
         <div style="padding: 20px 0; border-top: 1px solid rgba(255, 246, 229, 0.15); border-bottom: 1px solid rgba(255, 246, 229, 0.15); margin-bottom: 24px;">
           <p style="font-size: 15px; color: var(--color-marigold); margin-bottom: 6px; font-weight: 700;">
-            Official Government Sources & Portals:
+            ${t("footer.officialSources")}
           </p>
           <p style="font-size: 15px; color: rgba(255, 246, 229, 0.85); line-height: 1.6;">
             Skill India Digital &bull; National Career Service (NCS) &bull; National Scholarship Portal (NSP) &bull; Common Fellowship Portal &bull; UGC Distance Education Bureau (DEB) &bull; Stand-Up India &bull; Aajeevika (DAY-NRLM)
@@ -320,6 +376,190 @@
         </div>
       </div>
     `;
+  }
+
+  function getSakhiTopic(question) {
+    const text = question.toLocaleLowerCase();
+    const topics = [
+      { key: "phd", pattern: /ph\.?d|doctor|दूरस्थ|पीएचडी|शोध/, ids: ["edu-ugc-phd", "edu-doctoral-fellowship"], sourceUrl: "https://fellowships.gov.in" },
+      { key: "documents", pattern: /document|paper|certificate|काग़ज़|कागज|दस्तावेज़|दस्तावेज/, ids: [] },
+      { key: "finance", pattern: /financial|finance|money|scholarship|fellowship|loan|support|आर्थिक|पैसे|छात्रवृत्ति|फ़ेलोशिप|ऋण|मदद/, ids: ["edu-nsp-scholarship", "supp-mudra-loan"], sourceUrl: "https://scholarships.gov.in" },
+      { key: "trainer", pattern: /trainer|teach|teacher|ट्रेनर|प्रशिक्षक|सिखा/, ids: ["cert-rpl-tailoring", "opp-ncs-trainer"], sourceUrl: "https://ncs.gov.in" },
+      { key: "skill", pattern: /certif|skill|tailor|embroid|कौशल|हुनर|प्रमाणपत्र|सिलाई|कढ़ाई/, ids: ["cert-rpl-tailoring", "cert-digital-skills"], sourceUrl: "https://skillindiadigital.gov.in" },
+      { key: "study", pattern: /study|education|college|school|degree|restart|पढ़|शिक्षा|कॉलेज|स्कूल|डिग्री|शुरू/, ids: ["edu-nios-class12", "edu-ignou-ug"], sourceUrl: "https://ignou.ac.in" }
+    ];
+    return topics.find(topic => topic.pattern.test(text)) || { key: "unknown", pattern: null, ids: [], sourceUrl: null };
+  }
+
+  function getSakhiContext() {
+    const profile = Storage.getProfile();
+    if (!profile) return t("sakhi.context.guest");
+    const goal = wizardGoals.find(item => item.id === profile.goal);
+    const skills = Array.isArray(profile.skills) ? profile.skills.map(skill => {
+      const key = `wizard.skill.${String(skill).toLowerCase()}`;
+      return t(key) === key ? String(skill) : t(key);
+    }).filter(Boolean) : [];
+    const parts = [];
+    if (goal) parts.push(t("sakhi.context.goal").replace("{goal}", t(goal.label)));
+    const district = [profile.district, profile.state].filter(Boolean).join(", ");
+    if (district) parts.push(t("sakhi.context.district").replace("{district}", district));
+    if (skills.length) parts.push(t("sakhi.context.skills").replace("{skills}", skills.join(", ")));
+    return parts.join(" ");
+  }
+
+  function getSakhiRecommendations(topic) {
+    const opportunities = window.OPPORTUNITIES || [];
+    let matches;
+    if (topic.key === "documents" || topic.key === "unknown") {
+      const profile = Storage.getProfile();
+      matches = profile
+        ? getPathMatches(profile, opportunities).slice(0, 2).map(match => match.opportunity)
+        : [];
+      if (!matches.length) matches = ["edu-nios-class12", "cert-rpl-tailoring"]
+        .map(id => opportunities.find(item => item.id === id)).filter(Boolean);
+    } else {
+      matches = topic.ids.map(id => opportunities.find(item => item.id === id)).filter(Boolean);
+    }
+    return matches.slice(0, 2);
+  }
+
+  function renderSakhiMessage(message) {
+    const recommendations = message.opportunities && message.opportunities.length
+      ? `<div class="sakhi-recommendations">${message.opportunities.map(opportunity => `
+          <a class="sakhi-opportunity-link" href="#/opportunity/${encodeURIComponent(opportunity.id)}">
+            <span>${escapeHtml(opportunity.title)}</span><span>${t("sakhi.opportunity")} ${ICONS.arrowRight}</span>
+          </a>
+        `).join("")}</div>`
+      : "";
+    const sources = message.portals && message.portals.length
+      ? `<div class="sakhi-source-links">${message.portals.map(portal => `
+          <a href="${escapeHtml(portal.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(portal.label)}</a>
+        `).join("")}</div>`
+      : message.source
+        ? `<a class="sakhi-source-link" href="${escapeHtml(message.source.url)}" target="_blank" rel="noopener noreferrer">${t("sakhi.official")}: ${escapeHtml(message.source.label)}</a>`
+        : "";
+    return `<article class="sakhi-message sakhi-message--${message.role}">
+      <p>${escapeHtml(message.text)}</p>${recommendations}${sources}
+    </article>`;
+  }
+
+  function renderSakhiWidget() {
+    const root = document.getElementById("sakhi-root");
+    if (!root) return;
+    const profile = Storage.getProfile();
+    const name = profile && profile.name ? profile.name : t("sakhi.guestName");
+    const currentPath = (window.location.hash || "#/home").split("?")[0];
+    let showHint = false;
+    if (currentPath === "#/path" && profile) {
+      try {
+        showHint = localStorage.getItem(SAKHI_HINT_KEY) !== "seen";
+        if (showHint) localStorage.setItem(SAKHI_HINT_KEY, "seen");
+      } catch (e) {
+        showHint = false;
+      }
+    }
+    const quickQuestions = Array.from({ length: 6 }, (_, index) => t(`sakhi.quick${index + 1}`));
+    const messages = sakhiMessages.map(renderSakhiMessage).join("");
+    const panel = sakhiOpen ? `
+      <section class="sakhi-panel" id="sakhi-panel" role="dialog" aria-modal="false" aria-labelledby="sakhi-panel-title">
+        <div class="sakhi-panel-top">
+          <div class="sakhi-avatar">${window.ART ? window.ART.sakhi() : ""}</div>
+          <div class="sakhi-panel-heading">
+            <h2 id="sakhi-panel-title">${t("sakhi.title")}</h2>
+            <p>${t("tagline.sakhi")}</p>
+          </div>
+          <button type="button" class="sakhi-close" aria-label="${t("btn.close")}">&times;</button>
+        </div>
+        <div class="sakhi-chat" aria-live="polite">
+          ${renderSakhiMessage({ role: "sakhi", text: t("sakhi.greeting").replace("{name}", name) })}
+          ${messages}
+          ${sakhiTyping ? `<div class="sakhi-typing" role="status" aria-label="${t("sakhi.typing")}"><span></span><span></span><span></span></div>` : ""}
+          ${sakhiMessages.length === 0 ? `<div class="sakhi-quick-questions">${quickQuestions.map(question => `
+            <button type="button" class="sakhi-quick-chip" data-sakhi-question="${escapeHtml(question)}">${escapeHtml(question)}</button>
+          `).join("")}</div>` : ""}
+        </div>
+        <form class="sakhi-composer">
+          <label class="sr-only" for="sakhi-question">${t("sakhi.placeholder")}</label>
+          <input id="sakhi-question" name="question" type="text" maxlength="240" autocomplete="off" placeholder="${escapeHtml(t("sakhi.placeholder"))}" ${sakhiTyping ? "disabled" : ""}>
+          <button type="submit" aria-label="${t("sakhi.send")}" ${sakhiTyping ? "disabled" : ""}>${ICONS.arrowRight}</button>
+        </form>
+        <p class="sakhi-panel-note">${t("sakhi.privacy")}</p>
+      </section>
+    ` : "";
+    root.innerHTML = `${panel}
+      <div class="sakhi-launcher-wrap">
+        ${showHint && !sakhiOpen ? `<span class="sakhi-first-hint">${t("sakhi.hint")}</span>` : ""}
+        <button type="button" class="sakhi-launcher" aria-expanded="${sakhiOpen}" aria-controls="sakhi-panel">
+          ${ICONS.speechBubble}<span>${t("sakhi.button")}</span>
+        </button>
+      </div>`;
+
+    const launcher = root.querySelector(".sakhi-launcher");
+    launcher.addEventListener("click", () => {
+      sakhiOpen = !sakhiOpen;
+      renderSakhiWidget();
+      if (sakhiOpen) root.querySelector("#sakhi-question").focus();
+    });
+    const closeButton = root.querySelector(".sakhi-close");
+    if (closeButton) closeButton.addEventListener("click", () => {
+      sakhiOpen = false;
+      renderSakhiWidget();
+    });
+    root.onkeydown = event => {
+      if (event.key === "Escape" && sakhiOpen) {
+        sakhiOpen = false;
+        renderSakhiWidget();
+      }
+    };
+    root.querySelectorAll("[data-sakhi-question]").forEach(button => button.addEventListener("click", () => {
+      askSakhiQuestion(button.dataset.sakhiQuestion);
+    }));
+    const form = root.querySelector(".sakhi-composer");
+    if (form) form.addEventListener("submit", event => {
+      event.preventDefault();
+      const input = form.elements.question;
+      askSakhiQuestion(input.value);
+    });
+    const chat = root.querySelector(".sakhi-chat");
+    if (chat) chat.scrollTop = chat.scrollHeight;
+  }
+
+  function askSakhiQuestion(question) {
+    const prompt = String(question || "").trim();
+    if (!prompt || sakhiTyping) return;
+    sakhiMessages.push({ role: "user", text: prompt });
+    sakhiTyping = true;
+    renderSakhiWidget();
+    window.setTimeout(() => {
+      const topic = getSakhiTopic(prompt);
+      const opportunities = getSakhiRecommendations(topic);
+      const context = getSakhiContext();
+      const answer = t(`sakhi.answer.${topic.key}`)
+        .replace("{context}", context)
+        .replace("{context}", context);
+      const sourceOpportunity = opportunities[0];
+      const sourceUrl = topic.sourceUrl || (sourceOpportunity && sourceOpportunity.officialUrl);
+      const sourceLabel = topic.key === "phd" ? "Common Fellowship Portal"
+        : topic.key === "trainer" ? "National Career Service (NCS)"
+          : sourceOpportunity ? sourceOpportunity.department : "Official government portals";
+      const portals = topic.key === "unknown" ? [
+        { label: "National Scholarship Portal", url: "https://scholarships.gov.in" },
+        { label: "UGC Distance Education Bureau", url: "https://deb.ugc.ac.in" },
+        { label: "Skill India Digital", url: "https://skillindiadigital.gov.in" },
+        { label: "Common Fellowship Portal", url: "https://fellowships.gov.in" }
+      ] : null;
+      sakhiMessages.push({
+        role: "sakhi",
+        text: answer,
+        opportunities,
+        source: sourceUrl ? { url: sourceUrl, label: sourceLabel } : null,
+        portals
+      });
+      sakhiTyping = false;
+      renderSakhiWidget();
+      const input = document.getElementById("sakhi-question");
+      if (input) input.focus();
+    }, 600);
   }
 
   // --- Route Views ---
@@ -397,9 +637,9 @@
                 “${t("quote.sunita")}”
               </blockquote>
               <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 24px;">
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">tailoring</span>
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">embroidery</span>
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">teach others</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">tailoring</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">embroidery</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">teach others</span>
               </div>
               <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('sunita')" style="width: 100%;">
                 ${currentLang === "hi" ? "सुनीता का रास्ता देखें" : "See Sunita's path"} &rarr;
@@ -415,14 +655,14 @@
                 <h3 style="font-size: 26px; color: var(--color-forest);">Priya</h3>
                 <span class="tag">Lucknow, UP</span>
               </div>
-              <p style="font-size: 15px; font-weight: 700; color: var(--color-vermilion); margin-bottom: 14px;">MSc Mathematics &bull; Postgraduate</p>
+              <p style="font-size: 15px; font-weight: 700; color: var(--color-vermilion-accessible); margin-bottom: 14px;">MSc Mathematics &bull; Postgraduate</p>
               <blockquote style="font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 18px; color: var(--color-ink); font-style: italic;">
                 “${t("quote.priya")}”
               </blockquote>
               <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 24px;">
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">mathematics</span>
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">academic research</span>
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">fellowship</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">mathematics</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">academic research</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">fellowship</span>
               </div>
               <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('priya')" style="width: 100%;">
                 ${currentLang === "hi" ? "प्रिया का रास्ता देखें" : "See Priya's path"} &rarr;
@@ -443,9 +683,9 @@
                 “${t("quote.anjali")}”
               </blockquote>
               <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 24px;">
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">writing</span>
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">computers</span>
-                <span class="chip" style="font-size: 13px; padding: 4px 10px;">degree</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">writing</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">computers</span>
+                <span class="chip" style="font-size: 15px; padding: 4px 10px;">degree</span>
               </div>
               <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('anjali')" style="width: 100%;">
                 ${currentLang === "hi" ? "अंजलि का रास्ता देखें" : "See Anjali's path"} &rarr;
@@ -497,7 +737,7 @@
             <div class="how-stop how-stop--right fade-up">
               <div class="how-num-badge how-num-badge--vermilion">2</div>
               <div class="how-card">
-                <h3 style="font-size: 24px; color: var(--color-vermilion); margin-bottom: 8px;">
+                <h3 style="font-size: 24px; color: var(--color-vermilion-accessible); margin-bottom: 8px;">
                   ${t("how.step2.title")}
                 </h3>
                 <p style="font-size: 16px; margin: 0; line-height: 1.5;">
@@ -556,7 +796,7 @@
                 ${window.ART ? window.ART.scene("tailor") : ""}
               </div>
               <span class="tag tag--certification" style="margin-bottom: 14px;">${t("pillar.certification")}</span>
-              <h3 style="color: var(--color-vermilion); font-size: 24px; margin-bottom: 10px;">
+              <h3 style="color: var(--color-vermilion-accessible); font-size: 24px; margin-bottom: 10px;">
                 ${t("tagline.cert")}
               </h3>
               <p style="font-size: 16px; margin-bottom: 22px;">${t("pillar.certification.desc")}</p>
@@ -716,83 +956,126 @@
   function renderExplore() {
     const app = document.getElementById("app-view");
     const opps = window.OPPORTUNITIES || [];
-
-    // Parse query params if any
     const hashParts = window.location.hash.split("?");
     const params = new URLSearchParams(hashParts[1] || "");
-    const activePillar = params.get("pillar") || "all";
-
-    const filtered = activePillar === "all"
-      ? opps
-      : opps.filter(o => o.pillar === activePillar);
+    let activePillar = params.get("pillar") || "all";
+    let activeMode = "all";
+    let query = "";
+    const profile = Storage.getProfile();
 
     app.innerHTML = `
-      <section class="section section-cream">
-        <div class="container">
-          <div style="margin-bottom: 36px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
-              <div>
-                <h1 style="font-size: clamp(34px, 5vw, 48px); margin-bottom: 12px;">${t("route.explore.title")}</h1>
-                <p style="font-size: 20px; color: var(--color-ink);">${t("route.explore.desc")}</p>
-              </div>
-              <a href="#/start" class="btn btn-sm btn-primary">${t("btn.start_onboarding")}</a>
-            </div>
-
-            <!-- Filter Chips -->
-            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top: 24px;">
-              <a href="#/explore" class="chip ${activePillar === 'all' ? 'active' : ''}">${t("route.explore.filter_all")} (${opps.length})</a>
-              <a href="#/explore?pillar=education" class="chip ${activePillar === 'education' ? 'active' : ''}">${t("pillar.education")}</a>
-              <a href="#/explore?pillar=certification" class="chip ${activePillar === 'certification' ? 'active' : ''}">${t("pillar.certification")}</a>
-              <a href="#/explore?pillar=opportunity" class="chip ${activePillar === 'opportunity' ? 'active' : ''}">${t("pillar.opportunity")}</a>
-              <a href="#/explore?pillar=support" class="chip ${activePillar === 'support' ? 'active' : ''}">${t("pillar.support")}</a>
-            </div>
+      <section class="explore-page">
+        <div class="container explore-container">
+          <div class="explore-heading">
+            <span class="tag tag--support">${t("tagline.sakhi")}</span>
+            <h1>${t("route.explore.title")}</h1>
+            <p>${t("route.explore.desc")}</p>
+            <label class="explore-search">
+              <span class="sr-only">${t("explore.search")}</span>
+              <span aria-hidden="true">⌕</span>
+              <input type="search" id="explore-search" placeholder="${escapeHtml(t("explore.search"))}" autocomplete="off">
+            </label>
           </div>
-
-          <!-- Opportunities List Grid -->
-          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px;">
-            ${filtered
-              .map(o => {
-                const isSaved = Storage.isSaved(o.id);
-                return `
-                <div class="card shape-arch block-behind block-behind--${o.pillar === 'education' ? 'cobalt' : o.pillar === 'certification' ? 'vermilion' : o.pillar === 'opportunity' ? 'forest' : 'blush'} fade-up">
-                  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 14px;">
-                    <span class="tag tag--${o.pillar}">${t(`pillar.${o.pillar}`)}</span>
-                    <button class="heart-btn ${isSaved ? 'saved' : ''}" onclick="window.toggleSaveOpportunity('${o.id}')" aria-label="${isSaved ? t('btn.remove_save') : t('btn.save')}">
-                      ${isSaved ? ICONS.heartFilled : ICONS.heart}
-                    </button>
+          <div class="explore-filters">
+            <div class="explore-filter-group">
+              <p>${t("explore.filters")}</p>
+              <div class="explore-filter-row">
+                ${["all", "education", "certification", "opportunity", "support"].map(pillar => `
+                  <button type="button" class="chip explore-filter-chip ${activePillar === pillar ? "active" : ""}" data-pillar-filter="${pillar}">
+                    ${pillar === "all" ? t("route.explore.filter_all") : t(`explore.pillar.${pillar}`)}
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+            <div class="explore-filter-group">
+              <p>${t("explore.mode")}</p>
+              <div class="explore-filter-row">
+                ${["all", "online", "offline", "both"].map(mode => `
+                  <button type="button" class="chip explore-mode-chip ${activeMode === mode ? "active" : ""}" data-mode-filter="${mode}">
+                    ${t(`explore.mode.${mode === "all" ? "any" : mode === "offline" ? "inPerson" : mode}`)}
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+            <label class="explore-state-filter ${profile && profile.state ? "" : "is-disabled"}">
+              <input type="checkbox" id="explore-my-state" ${profile && profile.state ? "" : "disabled"}>
+              <span>${t("explore.state")}${profile && profile.state ? ` (${escapeHtml(profile.state)})` : ""}</span>
+            </label>
+          </div>
+          <div class="explore-grid" id="explore-grid">
+            ${opps.map((opportunity, index) => {
+              const isSaved = Storage.isSaved(opportunity.id);
+              const searchText = `${opportunity.title} ${opportunity.department} ${opportunity.whatYouGet} ${opportunity.skillTags.join(" ")} ${opportunity.goalTags.join(" ")}`.toLowerCase();
+              return `
+                <article class="explore-card block-behind block-behind--${pillarBlockClass(opportunity.pillar)} fade-up"
+                  data-pillar="${escapeHtml(opportunity.pillar)}" data-mode="${escapeHtml(opportunity.mode)}"
+                  data-states="${escapeHtml(opportunity.states)}" data-search="${escapeHtml(searchText)}"
+                  style="--card-turn:${index % 2 ? "1.1deg" : "-1.2deg"}">
+                  <div class="explore-card-inner">
+                    <div class="explore-card-meta">
+                      <span class="tag tag--${escapeHtml(opportunity.pillar)}">${t(`pillar.${opportunity.pillar}`)}</span>
+                      <button type="button" class="explore-save ${isSaved ? "is-saved" : ""}" onclick="window.toggleSaveOpportunity('${escapeHtml(opportunity.id)}')" aria-label="${t(isSaved ? "btn.remove_save" : "explore.save")}">
+                        ${isSaved ? ICONS.heartFilled : ICONS.heart}<span>${t(isSaved ? "explore.saved" : "explore.save")}</span>
+                      </button>
+                    </div>
+                    <h2><a href="#/opportunity/${encodeURIComponent(opportunity.id)}">${escapeHtml(opportunity.title)}</a></h2>
+                    <p class="explore-department">${escapeHtml(opportunity.department)}</p>
+                    <p class="explore-description">${escapeHtml(opportunity.whatYouGet)}</p>
+                    <div class="explore-card-tags">
+                      <span class="tag">${t(`tag.edu.${opportunity.minEducation}`)}</span>
+                      <span class="tag">${t(`tag.mode.${opportunity.mode}`)}</span>
+                    </div>
+                    <a href="#/opportunity/${encodeURIComponent(opportunity.id)}" class="btn btn-sm btn-primary">${t("btn.view_details")}</a>
                   </div>
-
-                  <h3 style="font-size: 22px; margin-bottom: 10px; min-height: 54px;">
-                    <a href="#/opportunity/${o.id}">${escapeHtml(o.title)}</a>
-                  </h3>
-
-                  <p style="font-size: 15px; color: #555; margin-bottom: 12px;">
-                    ${escapeHtml(o.department)}
-                  </p>
-
-                  <p style="font-size: 16px; margin-bottom: 16px; line-height: 1.5;">
-                    ${escapeHtml(o.whatYouGet)}
-                  </p>
-
-                  <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 20px;">
-                    <span class="tag">${t(`tag.edu.${o.minEducation}`)}</span>
-                    <span class="tag">${t(`tag.mode.${o.mode}`)}</span>
-                  </div>
-
-                  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; border-top:1px solid #ddd; padding-top:16px;">
-                    <a href="#/opportunity/${o.id}" class="btn btn-sm btn-primary">${t("btn.view_details")}</a>
-                    <a href="${o.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline" style="font-size:14px; gap:4px;">
-                      Official ${ICONS.external}
-                    </a>
-                  </div>
-                </div>
+                </article>
               `;
-              })
-              .join("")}
+            }).join("")}
+          </div>
+          <div class="explore-empty" id="explore-empty" hidden>
+            <div class="explore-empty-art">${window.ART ? window.ART.scene("learner") : ""}</div>
+            <p>${t("explore.empty")}</p>
           </div>
         </div>
       </section>
     `;
+
+    const cards = [...app.querySelectorAll(".explore-card")];
+    const applyFilters = () => {
+      const stateOnly = app.querySelector("#explore-my-state").checked;
+      const state = profile && profile.state;
+      let visible = 0;
+      cards.forEach(card => {
+        const mode = card.dataset.mode;
+        const matchesMode = activeMode === "all" || mode === "both" || mode === activeMode;
+        const matchesState = !stateOnly || card.dataset.states === "All India"
+          || card.dataset.states.split(",").map(value => value.trim()).includes(state);
+        const matches = (activePillar === "all" || card.dataset.pillar === activePillar)
+          && matchesMode && matchesState && card.dataset.search.includes(query);
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      });
+      app.querySelector("#explore-empty").hidden = visible > 0;
+      app.querySelectorAll("[data-pillar-filter]").forEach(button => {
+        button.classList.toggle("active", button.dataset.pillarFilter === activePillar);
+      });
+      app.querySelectorAll("[data-mode-filter]").forEach(button => {
+        button.classList.toggle("active", button.dataset.modeFilter === activeMode);
+      });
+    };
+    app.querySelector("#explore-search").addEventListener("input", event => {
+      query = event.target.value.trim().toLowerCase();
+      applyFilters();
+    });
+    app.querySelectorAll("[data-pillar-filter]").forEach(button => button.addEventListener("click", () => {
+      activePillar = button.dataset.pillarFilter;
+      applyFilters();
+    }));
+    app.querySelectorAll("[data-mode-filter]").forEach(button => button.addEventListener("click", () => {
+      activeMode = button.dataset.modeFilter;
+      applyFilters();
+    }));
+    app.querySelector("#explore-my-state").addEventListener("change", applyFilters);
+    applyFilters();
   }
 
   // 3. Opportunity Detail View (#/opportunity/:id)
@@ -805,8 +1088,7 @@
       app.innerHTML = `
         <section class="section section-cream">
           <div class="container text-center" style="padding: 60px 0;">
-            <h2>Opportunity Not Found</h2>
-            <p style="margin: 20px 0;">We could not find the opportunity you are looking for.</p>
+            <h2>${t("opportunity.notFound")}</h2>
             <a href="#/explore" class="btn btn-primary">${t("btn.explore")}</a>
           </div>
         </section>
@@ -815,84 +1097,120 @@
     }
 
     const isSaved = Storage.isSaved(opp.id);
+    const profile = Storage.getProfile();
 
     app.innerHTML = `
-      <section class="section section-cream">
-        <div class="container" style="max-width: 900px;">
-          <div style="margin-bottom: 24px;">
-            <a href="#/explore" class="btn btn-sm btn-outline">&larr; ${t("btn.back")}</a>
+      <section class="opportunity-page">
+        <header class="opportunity-hero pillar-band--${escapeHtml(opp.pillar)}">
+          <div class="container opportunity-hero-inner">
+            <a href="#/explore" class="opportunity-back">${t("btn.back")}</a>
+            <div class="opportunity-hero-copy">
+              <span class="tag tag--${escapeHtml(opp.pillar)}">${t(`pillar.${opp.pillar}`)}</span>
+              <h1>${escapeHtml(opp.title)}</h1>
+              <p>${escapeHtml(opp.department)} · ${escapeHtml(opp.type)}</p>
+              <div class="opportunity-hero-tags">
+                <span>${t(`tag.edu.${opp.minEducation}`)}</span>
+                <span>${t(`tag.mode.${opp.mode}`)}</span>
+              </div>
+            </div>
+            <div class="opportunity-hero-art" aria-hidden="true">${window.ART ? window.ART.scene(opp.pillar === "education" ? "scholar" : opp.pillar === "certification" ? "tailor" : opp.pillar === "support" ? "entrepreneur" : "teacher") : ""}</div>
           </div>
-
-          <div class="card shape-arch block-behind block-behind--${opp.pillar === 'education' ? 'cobalt' : opp.pillar === 'certification' ? 'vermilion' : opp.pillar === 'opportunity' ? 'forest' : 'blush'} fade-up" style="padding: 40px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px; flex-wrap:wrap; gap:12px;">
-              <div style="display:flex; gap:10px; align-items:center;">
-                <span class="tag tag--${opp.pillar}">${t(`pillar.${opp.pillar}`)}</span>
-                <span class="tag">${t(`tag.edu.${opp.minEducation}`)}</span>
-                <span class="tag">${t(`tag.mode.${opp.mode}`)}</span>
-              </div>
-              <button class="btn btn-sm ${isSaved ? 'btn-marigold' : 'btn-outline'}" onclick="window.toggleSaveOpportunity('${opp.id}')">
-                ${isSaved ? ICONS.heartFilled : ICONS.heart} ${isSaved ? t("btn.saved") : t("btn.save")}
-              </button>
-            </div>
-
-            <h1 style="font-size: clamp(30px, 4.5vw, 44px); margin-bottom: 12px;">${escapeHtml(opp.title)}</h1>
-            <p style="font-size: 18px; color: var(--color-forest); font-weight: 600; margin-bottom: 24px;">
-              ${escapeHtml(opp.department)} &bull; ${escapeHtml(opp.type)}
-            </p>
-
-            <div style="background-color: var(--color-oat); border-radius: 16px; padding: 24px; margin-bottom: 32px;">
-              <h3 style="font-size: 20px; margin-bottom: 10px;">${t("route.opportunity.what_you_get")}</h3>
-              <p style="font-size: 18px; line-height: 1.6;">${escapeHtml(opp.whatYouGet)}</p>
-            </div>
-
-            <!-- Indicative Eligibility -->
-            <div style="margin-bottom: 32px;">
-              <h3 style="font-size: 22px; margin-bottom: 16px;">${t("route.opportunity.eligibility")}</h3>
-              <ul style="list-style:none; display:flex; flex-direction:column; gap:12px;">
-                ${opp.eligibilityQuestions.map(q => `
-                  <li style="display:flex; align-items:flex-start; gap:12px; background: #fff; padding: 14px 18px; border-radius: 12px; border: 1.5px solid #E2D9C8;">
-                    <span style="color:var(--color-forest);">${ICONS.check}</span>
-                    <span>${escapeHtml(q)}</span>
-                  </li>
-                `).join("")}
-              </ul>
-            </div>
-
-            <!-- Documents -->
-            <div style="margin-bottom: 32px;">
-              <h3 style="font-size: 22px; margin-bottom: 16px;">${t("route.opportunity.documents")}</h3>
-              <ul style="padding-left: 24px; display:flex; flex-direction:column; gap:8px;">
-                ${opp.documents.map(d => `<li>${escapeHtml(d)}</li>`).join("")}
-              </ul>
-            </div>
-
-            <!-- Steps -->
-            <div style="margin-bottom: 36px;">
-              <h3 style="font-size: 22px; margin-bottom: 16px;">${t("route.opportunity.steps")}</h3>
-              <ol style="padding-left: 24px; display:flex; flex-direction:column; gap:12px;">
-                ${opp.steps.map(s => `<li style="line-height:1.6;">${escapeHtml(s)}</li>`).join("")}
-              </ol>
-            </div>
-
-            <!-- Official Website Notice & Actions -->
-            <div style="background-color: var(--color-cream); border: 2px dashed var(--color-ink); border-radius: 16px; padding: 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-              <div>
-                <strong style="display:block; font-size:18px;">${t("route.opportunity.official_link")}</strong>
-                <span style="font-size:15px; color:#555;">${escapeHtml(opp.officialUrl)}</span><br>
-                <small style="color:var(--color-forest); font-weight:600;">${escapeHtml(opp.lastVerified)}</small>
-              </div>
-              <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                <a href="#/apply/${opp.id}" class="btn btn-outline">${t("btn.apply_guide")}</a>
-                <a href="${opp.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-                  ${t("btn.visit_official")} ${ICONS.external}
-                </a>
-              </div>
-            </div>
+          <svg class="opportunity-wave" viewBox="0 0 1200 42" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 C160 38 340 42 520 18 S880 36 1050 14 S1170 22 1200 36 L1200 42 L0 42Z" fill="var(--color-cream)"/></svg>
+        </header>
+        <div class="container opportunity-content">
+          <div class="opportunity-main">
+            <section class="opportunity-reading-card">
+              <h2>${t("opportunity.whatGet")}</h2>
+              <p>${escapeHtml(opp.whatYouGet)}</p>
+            </section>
+            <section class="opportunity-reading-card">
+              <h2>${t("opportunity.whoApply")}</h2>
+              <p class="opportunity-qualification">${t(`tag.edu.${opp.minEducation}`)}</p>
+              <ul class="opportunity-check-list">${opp.eligibilityQuestions.map(question => `<li>${ICONS.check}<span>${escapeHtml(question)}</span></li>`).join("")}</ul>
+              <button type="button" class="btn btn-primary" onclick="window.startEligibilityCheck('${escapeHtml(opp.id)}')">${t("path.eligible")}</button>
+            </section>
+            <section class="opportunity-reading-card">
+              <h2>${t("opportunity.need")}</h2>
+              <ul class="opportunity-document-list">${opp.documents.map((document, index) => `<li><span>${index + 1}</span>${escapeHtml(document)}</li>`).join("")}</ul>
+            </section>
+            <section class="opportunity-reading-card">
+              <h2>${t("opportunity.how")}</h2>
+              <ol class="opportunity-steps">${opp.steps.map(step => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+            </section>
+            ${profile ? (() => {
+              const match = getPathMatches(profile, [opp])[0];
+              return `<section class="opportunity-fit"><h2>${t("opportunity.whyFits")}</h2>${match
+                ? `<ul>${match.reasons.map(reason => `<li>${ICONS.check}<span>${escapeHtml(reason)}</span></li>`).join("")}</ul>`
+                : `<p>${t("opportunity.noFit")}</p>`}</section>`;
+            })() : ""}
+            <section class="opportunity-official">
+              <div><h2>${t("opportunity.official")}</h2><p>${escapeHtml(opp.lastVerified)}</p><span>${escapeHtml(opp.officialUrl)}</span></div>
+              <a href="${escapeHtml(opp.officialUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">${t("opportunity.goOfficial")} ${ICONS.external}</a>
+            </section>
           </div>
+          <aside class="opportunity-side-art">${window.ART ? window.ART.scene(opp.pillar === "education" ? "scholar" : opp.pillar === "certification" ? "tailor" : "learner") : ""}</aside>
+        </div>
+        <div class="opportunity-mobile-actions">
+          <button type="button" class="btn btn-marigold" onclick="window.toggleSaveOpportunity('${escapeHtml(opp.id)}')">${isSaved ? ICONS.heartFilled : ICONS.heart} ${t(isSaved ? "explore.saved" : "opportunity.stickySave")}</button>
+          <button type="button" class="btn btn-primary" onclick="window.startEligibilityCheck('${escapeHtml(opp.id)}')">${t("path.eligible")}</button>
         </div>
       </section>
     `;
   }
+
+  window.startEligibilityCheck = function (id) {
+    const opportunity = (window.OPPORTUNITIES || []).find(item => item.id === id);
+    if (!opportunity) return;
+    const questions = opportunity.eligibilityQuestions.slice(0, 4);
+    const answers = [];
+    const showResult = () => {
+      const noAnswer = answers.includes("no");
+      const unsureAnswer = answers.includes("unsure");
+      const title = noAnswer ? t("eligibility.alternative")
+        : unsureAnswer ? t("eligibility.check")
+          : t("eligibility.good");
+      const alternatives = noAnswer
+        ? (window.OPPORTUNITIES || [])
+          .filter(item => item.id !== opportunity.id && item.pillar === opportunity.pillar)
+          .slice(0, 2)
+        : [];
+      const resultArt = window.ART
+        ? `<div class="eligibility-result-art">${window.ART.scene(noAnswer ? "learner" : "teacher")}</div>`
+        : "";
+      openSheet(t("eligibility.title"), `
+        <div class="eligibility-result">
+          ${resultArt}
+          <h4>${title}</h4>
+          <p>${t("eligibility.disclaimer")}</p>
+          ${alternatives.length ? `<h5>${t("eligibility.alternatives")}</h5><ul>${alternatives.map(item => `<li><a href="#/opportunity/${encodeURIComponent(item.id)}">${escapeHtml(item.title)}</a></li>`).join("")}</ul>` : ""}
+          <button type="button" class="btn btn-primary" onclick="window.closeSheet()">${t("btn.close")}</button>
+        </div>
+      `);
+    };
+    const showQuestion = index => {
+      if (index >= questions.length) {
+        showResult();
+        return;
+      }
+      openSheet(t("eligibility.title"), `
+        <div class="eligibility-question">
+          <div class="eligibility-question-art">${window.ART ? window.ART.scene("learner") : ""}</div>
+          <p class="eligibility-count">${index + 1} / ${questions.length}</p>
+          <h4>${escapeHtml(questions[index])}</h4>
+          <div class="eligibility-answers">
+            ${["yes", "unsure", "no"].map(answer => `<button type="button" class="btn ${answer === "yes" ? "btn-primary" : "btn-outline"}" onclick="window.answerEligibility('${answer}')">${t(`eligibility.${answer}`)}</button>`).join("")}
+          </div>
+          <p class="eligibility-disclaimer">${t("eligibility.disclaimer")}</p>
+        </div>
+      `);
+    };
+    window.answerEligibility = answer => {
+      if (!["yes", "unsure", "no"].includes(answer)) return;
+      answers.push(answer);
+      showQuestion(answers.length);
+    };
+    showQuestion(0);
+  };
 
   const wizardGoals = [
     { id: "finish-education", label: "wizard.goal.education", icon: "rangoli" },
@@ -1542,7 +1860,7 @@
                 return `<li class="${done ? "is-complete" : ""}"><span class="path-progress-bead">${done ? ICONS.check : ""}</span><span>${label}</span></li>`;
               }).join("")}
             </ol>
-            <button type="button" class="btn btn-outline path-sakhi-button" disabled>${t("path.askSakhi")}</button>
+            <button type="button" class="btn btn-outline path-sakhi-button" onclick="window.openSakhi()">${t("path.askSakhi")}</button>
           </aside>
         </div>
       </section>
@@ -1553,52 +1871,82 @@
   function renderApply(id) {
     const app = document.getElementById("app-view");
     const opps = window.OPPORTUNITIES || [];
-    const opp = opps.find(o => o.id === id) || opps[0];
+    const opp = opps.find(o => o.id === id);
+    if (!opp) {
+      app.innerHTML = `<section class="section section-cream"><div class="container text-center" style="padding:60px 0"><h1>${t("route.opportunity.details")}</h1><p>${t("opportunity.notFound")}</p><a href="#/explore" class="btn btn-primary">${t("btn.explore")}</a></div></section>`;
+      return;
+    }
+    const stages = Storage.getApplicationStages();
+    const stage = Number.isInteger(stages[id]) ? Math.min(3, Math.max(0, stages[id])) : 0;
+    const checked = Storage.getApplicationChecklist(id);
+    Storage.setApplicationStage(id, stage);
+    Storage.setTrackerProgress("application-started", true);
 
     app.innerHTML = `
-      <section class="section section-cream">
-        <div class="container" style="max-width: 860px;">
-          <div style="margin-bottom: 24px;">
-            <a href="#/opportunity/${opp.id}" class="btn btn-sm btn-outline">&larr; ${t("btn.back")}</a>
-          </div>
-
-          <div class="card shape-arch block-behind block-behind--forest fade-up" style="padding: 40px;">
-            <span class="tag tag--support" style="margin-bottom: 14px;">${t("tagline.sakhi")}</span>
-            <h1 style="font-size: clamp(30px, 4vw, 42px); margin-bottom: 12px;">${t("route.apply.title")}</h1>
-            <h3 style="color: var(--color-forest); font-size: 22px; margin-bottom: 24px;">${escapeHtml(opp.title)}</h3>
-
-            <div style="background-color: var(--color-oat); border-radius: 16px; padding: 24px; margin-bottom: 32px;">
-              <h4 style="margin-bottom: 12px;">Before You Visit The Portal:</h4>
-              <p style="font-size: 17px; margin-bottom: 16px;">Check off the items you have ready on your phone or in hand:</p>
-              <ul style="list-style:none; display:flex; flex-direction:column; gap:12px;">
-                ${opp.documents.map((doc, idx) => `
-                  <li style="display:flex; align-items:center; gap:12px;">
-                    <input type="checkbox" id="check-doc-${idx}" style="width:20px; height:20px;">
-                    <label for="check-doc-${idx}" style="font-size:17px; cursor:pointer;">${escapeHtml(doc)}</label>
+      <section class="apply-page">
+        <div class="container apply-container">
+          <a href="#/opportunity/${encodeURIComponent(opp.id)}" class="btn btn-sm btn-outline apply-back">&larr; ${t("btn.back")}</a>
+          <header class="apply-heading">
+            <span class="tag tag--support">${t("tagline.sakhi")}</span>
+            <h1>${t("route.apply.title")}</h1>
+            <p>${escapeHtml(opp.title)}</p>
+          </header>
+          <div class="apply-layout">
+            <main class="apply-main">
+              <section class="apply-prep-tip">
+                <div>${window.ART ? window.ART.decor("bangles", { size: 44 }) : ""}</div>
+                <div><h2>${t("apply.tipTitle")}</h2><p>${t("apply.tip")}</p></div>
+              </section>
+              <section class="apply-checklist">
+                <h2>${t("apply.checklist")}</h2>
+                <p>${t("apply.checklistSaved")}</p>
+                <ul>
+                  ${opp.documents.map((document, index) => `
+                    <li>
+                      <input type="checkbox" id="apply-doc-${index}" data-checklist-index="${index}" ${checked.includes(index) ? "checked" : ""}>
+                      <label for="apply-doc-${index}">${escapeHtml(document)}</label>
+                    </li>
+                  `).join("")}
+                </ul>
+              </section>
+              <section class="apply-steps">
+                <h2>${t("opportunity.how")}</h2>
+                <ol>${opp.steps.map(step => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+              </section>
+              <a href="${escapeHtml(opp.officialUrl)}" target="_blank" rel="noopener noreferrer" data-application-start="true" class="btn btn-primary apply-official">${t("apply.openSite")} ${ICONS.external}</a>
+            </main>
+            <aside class="apply-tracker">
+              <h2>${t("apply.progress")}</h2>
+              <ol>
+                ${["preparing", "documents", "applied", "waiting"].map((key, index) => `
+                  <li class="${index <= stage ? "is-current" : ""}">
+                    <button type="button" data-application-stage="${index}" aria-pressed="${index === stage}">
+                      <span>${index < stage ? ICONS.check : index + 1}</span>${t(`apply.stage.${key}`)}
+                    </button>
                   </li>
                 `).join("")}
-              </ul>
-            </div>
-
-            <div style="margin-bottom: 32px;">
-              <h4 style="margin-bottom: 16px;">Application Sequence:</h4>
-              <ol style="padding-left: 24px; display:flex; flex-direction:column; gap:12px;">
-                ${opp.steps.map(step => `<li style="line-height:1.6;">${escapeHtml(step)}</li>`).join("")}
               </ol>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-              <button class="btn btn-outline" onclick="window.showToast('Checklist saved to device!')">
-                ${t("btn.download_summary")}
-              </button>
-              <a href="${opp.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-                ${t("btn.visit_official")} ${ICONS.external}
-              </a>
-            </div>
+            </aside>
           </div>
         </div>
       </section>
     `;
+    app.querySelectorAll("[data-checklist-index]").forEach(input => input.addEventListener("change", () => {
+      const current = Storage.getApplicationChecklist(id);
+      const index = Number(input.dataset.checklistIndex);
+      const updated = input.checked
+        ? [...new Set([...current, index])]
+        : current.filter(value => value !== index);
+      Storage.setApplicationChecklist(id, updated);
+      input.closest("li").classList.toggle("is-checked", input.checked);
+    }));
+    app.querySelectorAll("[data-application-stage]").forEach(button => button.addEventListener("click", () => {
+      const nextStage = Number(button.dataset.applicationStage);
+      Storage.setApplicationStage(id, nextStage);
+      Storage.setTrackerProgress("application-started", true);
+      renderNavbar();
+      renderApply(id);
+    }));
   }
 
   // 7. My Journey Dashboard (#/me)
@@ -1608,80 +1956,61 @@
     const savedIds = Storage.getSavedOpportunities();
     const opps = window.OPPORTUNITIES || [];
     const savedOpps = opps.filter(o => savedIds.includes(o.id));
+    const applicationStages = Storage.getApplicationStages();
+    const applications = Object.entries(applicationStages)
+      .filter(([, stage]) => Number.isInteger(stage) && stage >= 0)
+      .map(([id, stage]) => ({ opportunity: opps.find(item => item.id === id), stage: Math.min(3, stage) }))
+      .filter(item => item.opportunity);
+    const educationLabel = profile ? t(`tag.edu.${profile.education}`) : "";
+    const skillLabels = profile && Array.isArray(profile.skills) ? profile.skills : [];
+    const profileGoal = profile && wizardGoals.find(goal => goal.id === profile.goal);
+    const profileLocation = profile
+      ? [profile.district || profile.location, profile.state].filter(Boolean).join(", ")
+      : "";
+    const applicationStageKeys = ["preparing", "documents", "applied", "waiting"];
 
     app.innerHTML = `
-      <section class="section section-cream">
-        <div class="container">
-          <div style="margin-bottom: 36px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
-            <div>
-              <h1>${t("route.me.title")}</h1>
-              <p style="font-size: 20px; color: var(--color-ink);">${t("route.me.desc")}</p>
+      <section class="me-page">
+        <div class="container me-container">
+          <header class="me-heading">
+            <div><span class="tag tag--support">${t("tagline.sakhi")}</span><h1>${t("route.me.title")}</h1><p>${t("route.me.desc")}</p></div>
+            <p class="me-private">${t("me.private")}</p>
+          </header>
+          <section class="me-profile note">
+            <div class="me-profile-art">${window.ART ? window.ART.scene("learner") : ""}</div>
+            <div class="me-profile-copy">
+              <h2>${t("me.profile")}</h2>
+              <h3>${profile ? escapeHtml(profile.name) : t("nav.signin")}</h3>
+              ${profile ? `<div class="me-profile-chips"><span>${escapeHtml(educationLabel)}</span>${skillLabels.map(skill => { const key = `wizard.skill.${String(skill).toLowerCase()}`; return `<span>${escapeHtml(t(key) === key ? skill : t(key))}</span>`; }).join("")}${profileLocation ? `<span>${escapeHtml(profileLocation)}</span>` : ""}${profileGoal ? `<span>${t(profileGoal.label)}</span>` : ""}</div>` : `<p>${t("me.noProfile")}</p>`}
+              <a href="#/start" class="btn btn-sm btn-outline">${t("me.edit")}</a>
             </div>
-            <a href="#/start" class="btn btn-sm btn-outline">${profile ? 'Edit Profile' : 'Set Profile'}</a>
-          </div>
-
-          <!-- Active Profile Card -->
-          <div class="note fade-up" style="margin-bottom: 40px; transform: rotate(-0.5deg);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; flex-wrap:wrap; gap:12px;">
-              <h3 style="font-size: 24px; color: var(--color-forest);">
-                ${profile ? escapeHtml(profile.name) : 'Guest Visitor'}
-              </h3>
-              <span class="tag tag--support">${t("notice.privacy")}</span>
-            </div>
-            <p style="font-size: 16px;">
-              ${
-                profile
-                  ? `Location: <strong>${escapeHtml(profile.district || profile.location || 'Not set')}, ${escapeHtml(profile.state || '')}</strong> &bull; Education: <strong>${escapeHtml(profile.education || 'Class 10')}</strong>`
-                  : 'No active profile found. You can try a sample profile below or map your own journey.'
-              }
-            </p>
-            <div style="margin-top: 14px; display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('sunita')">Load Sunita (Tailoring)</button>
-              <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('priya')">Load Priya (PhD)</button>
-              <button class="btn btn-sm btn-primary" onclick="window.loadDemoProfile('anjali')">Load Anjali (Class 12)</button>
-            </div>
-          </div>
-
-          <!-- Saved Opportunities Section -->
-          <div style="margin-bottom: 24px;">
-            <h2>${t("route.me.saved_count")} (${savedOpps.length})</h2>
-          </div>
-
-          ${
-            savedOpps.length === 0
-              ? `
-              <div class="card shape-arch fade-up text-center" style="padding: 48px 24px; background-color: var(--color-oat);">
-                <p style="font-size: 20px; margin-bottom: 20px;">${t("route.me.no_saved")}</p>
-                <a href="#/explore" class="btn btn-primary">${t("btn.explore")}</a>
-              </div>
-            `
-              : `
-              <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px;">
-                ${savedOpps
-                  .map(
-                    o => `
-                  <div class="card shape-arch block-behind block-behind--${o.pillar === 'education' ? 'cobalt' : o.pillar === 'certification' ? 'vermilion' : o.pillar === 'opportunity' ? 'forest' : 'marigold'} fade-up">
-                    <div style="display:flex; justify-content:space-between; margin-bottom: 12px;">
-                      <span class="tag tag--${o.pillar}">${t(`pillar.${o.pillar}`)}</span>
-                      <button class="heart-btn saved" onclick="window.toggleSaveOpportunity('${o.id}')">
-                        ${ICONS.heartFilled}
-                      </button>
-                    </div>
-                    <h3 style="font-size: 20px; margin-bottom: 8px;">
-                      <a href="#/opportunity/${o.id}">${escapeHtml(o.title)}</a>
-                    </h3>
-                    <p style="font-size: 15px; margin-bottom: 16px; line-height: 1.5;">${escapeHtml(o.whatYouGet)}</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <a href="#/opportunity/${o.id}" class="btn btn-sm btn-primary">${t("btn.view_details")}</a>
-                      <a href="#/apply/${o.id}" class="btn btn-sm btn-outline">${t("btn.apply_guide")}</a>
-                    </div>
-                  </div>
-                `
-                  )
-                  .join("")}
-              </div>
-            `
-          }
+          </section>
+          <section class="me-section">
+            <div class="me-section-heading"><h2>${t("me.saved")}</h2><a href="#/explore" class="btn btn-sm btn-outline">${t("btn.explore")}</a></div>
+            ${savedOpps.length ? `<div class="me-saved-grid">${savedOpps.map((opportunity, index) => `
+              <article class="me-saved-note" style="--note-turn:${[-1.4, 1.2, -0.6, 1.6][index % 4]}deg">
+                <span class="tag tag--${escapeHtml(opportunity.pillar)}">${t(`pillar.${opportunity.pillar}`)}</span>
+                <button type="button" class="me-remove" onclick="window.toggleSaveOpportunity('${escapeHtml(opportunity.id)}')">${t("me.remove")}</button>
+                <h3><a href="#/opportunity/${encodeURIComponent(opportunity.id)}">${escapeHtml(opportunity.title)}</a></h3>
+                <p>${escapeHtml(opportunity.department)}</p>
+                <a href="#/apply/${encodeURIComponent(opportunity.id)}" class="btn btn-sm btn-primary">${t("btn.apply_guide")}</a>
+              </article>
+            `).join("")}</div>` : `<div class="me-empty"><p>${t("route.me.no_saved")}</p><a href="#/explore" class="btn btn-primary">${t("btn.explore")}</a></div>`}
+          </section>
+          <section class="me-section">
+            <h2>${t("me.applications")}</h2>
+            ${applications.length ? `<div class="me-applications">${applications.map(({ opportunity, stage }) => `
+              <article class="me-application">
+                <h3><a href="#/apply/${encodeURIComponent(opportunity.id)}">${escapeHtml(opportunity.title)}</a></h3>
+                <ol>${applicationStageKeys.map((key, index) => `<li class="${index <= stage ? "is-current" : ""}"><span>${index < stage ? ICONS.check : index + 1}</span>${t(`apply.stage.${key}`)}</li>`).join("")}</ol>
+                <a href="#/apply/${encodeURIComponent(opportunity.id)}" class="btn btn-sm btn-outline">${t("me.continueApplication")}</a>
+              </article>
+            `).join("")}</div>` : `<div class="me-empty"><p>${t("me.emptyApplications")}</p></div>`}
+          </section>
+          <section class="me-clear">
+            <p>${t("me.private")}</p>
+            <button type="button" class="btn btn-outline" onclick="window.confirmClearJourneyData()">${t("me.clear")}</button>
+          </section>
         </div>
       </section>
     `;
@@ -1989,7 +2318,7 @@
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 24px;">
               <div style="background:#fff; border:1.5px solid #D8CEB9; border-radius:14px; padding:20px;">
                 <h4 style="color:var(--color-forest); margin-bottom:8px;">Women Helpline</h4>
-                <p style="font-size:24px; font-weight:800; color:var(--color-vermilion); margin-bottom:4px;">181</p>
+                <p style="font-size:24px; font-weight:800; color:var(--color-vermilion-accessible); margin-bottom:4px;">181</p>
                 <small style="color:#555;">Toll-free 24x7 pan-India emergency and support</small>
               </div>
               <div style="background:#fff; border:1.5px solid #D8CEB9; border-radius:14px; padding:20px;">
@@ -2003,7 +2332,7 @@
                 <small style="color:#555;">MSDE Jan Shikshan Sansthan & RPL queries</small>
               </div>
             </div>
-            <button class="btn btn-primary" onclick="window.showToast('Offline summary package saved to device!')">
+            <button class="btn btn-primary" onclick="window.showToast('${t("kit.offlineSaved")}')">
               ${t("btn.download_summary")}
             </button>
           </div>
@@ -2094,6 +2423,8 @@
     const rawHash = window.location.hash || "#/home";
     const path = rawHash.split("?")[0];
 
+    closeSheet();
+
     // Scroll to top on navigation
     window.scrollTo({ top: 0, behavior: "instant" });
 
@@ -2130,6 +2461,7 @@
 
     // Attach IntersectionObserver for .fade-up
     initFadeUpObserver();
+    renderSakhiWidget();
   }
 
   // IntersectionObserver for gentle fade-up animations
@@ -2167,10 +2499,58 @@
   }
 
   // --- Global Handlers ---
+  window.openSakhi = function () {
+    sakhiOpen = true;
+    renderSakhiWidget();
+    const input = document.getElementById("sakhi-question");
+    if (input) input.focus();
+  };
+
+  window.openDemoGuide = function () {
+    openSheet(t("demo.title"), `
+      <ol class="demo-guide-steps">
+        ${Array.from({ length: 6 }, (_, index) => `<li>${t(`demo.step${index + 1}`)}</li>`).join("")}
+      </ol>
+    `);
+  };
+
   window.toggleSaveOpportunity = function (id) {
     const isNowSaved = Storage.toggleSave(id);
     showToast(isNowSaved ? t("toast.saved") : t("toast.unsaved"));
+    renderNavbar();
     router(); // Re-render current view to reflect new state
+  };
+
+  window.confirmClearJourneyData = function () {
+    openSheet(t("me.clear"), `
+      <div class="me-clear-confirm">
+        <p>${t("me.clearQuestion")}</p>
+        <div>
+          <button type="button" class="btn btn-primary" onclick="window.clearJourneyData()">${t("me.clearConfirm")}</button>
+          <button type="button" class="btn btn-outline" onclick="window.closeSheet()">${t("me.clearCancel")}</button>
+        </div>
+      </div>
+    `);
+  };
+
+  window.clearJourneyData = function () {
+    [
+      STORAGE_KEYS.PROFILE,
+      STORAGE_KEYS.SAVED_OPPORTUNITIES,
+      STORAGE_KEYS.TRACKER_PROGRESS,
+      STORAGE_KEYS.APPLICATION_STAGES,
+      STORAGE_KEYS.APPLICATION_CHECKLISTS,
+      SAKHI_HINT_KEY
+    ].forEach(key => localStorage.removeItem(key));
+    sakhiMessages = [];
+    sakhiTyping = false;
+    sakhiOpen = false;
+    onboardingDraft = null;
+    onboardingStep = 0;
+    closeSheet();
+    renderNavbar();
+    router();
+    showToast(t("me.cleared"));
   };
 
   function getDemoProfileData(found) {
@@ -2205,7 +2585,7 @@
       Storage.saveProfile(getDemoProfileData(found));
       onboardingDraft = null;
       onboardingStep = 0;
-      showToast(`${found.name}'s profile loaded!`);
+      showToast(t("toast.profile_loaded"));
       renderNavbar();
       window.location.hash = "#/path";
     }
