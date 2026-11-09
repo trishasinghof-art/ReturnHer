@@ -1,6 +1,6 @@
 /* ==========================================================================
    ReturnHer - Design System & CSS Foundation
-   Single source of truth: BRIEF.md v2
+   Single source of truth: docs/design-brief.md v2
    ========================================================================== */
 
 /* --- CSS Variables --- */
@@ -133,7 +133,7 @@ small {
   border: 0;
 }
 
-/* Typography Rules per BRIEF.md */
+/* Typography Rules per docs/design-brief.md */
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
   font-weight: 800;
@@ -187,7 +187,7 @@ img, svg {
   display: block;
 }
 
-/* --- Contrast Rules from BRIEF.md ---
+/* --- Contrast Rules from docs/design-brief.md ---
    ink on cream, oat, marigold, blush.
    cream on forest, cobalt, vermilion.
    Never cream on marigold; never marigold text on cream.
@@ -828,7 +828,7 @@ img, svg {
 }
 
 /* ==========================================================================
-   Motion & Animation per BRIEF.md
+   Motion & Animation per docs/design-brief.md
    Slow and gentle: figures sway (6s), flowers rotate (40s), etc.
    ========================================================================== */
 .fade-up {
@@ -913,7 +913,7 @@ img, svg {
   transform: scale(1.05);
 }
 
-/* Prefers-Reduced-Motion: ALL motion off strictly per BRIEF.md */
+/* Prefers-Reduced-Motion: ALL motion off strictly per docs/design-brief.md */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -1105,7 +1105,7 @@ img, svg {
 }
 
 /* ==========================================================================
-   Footer per BRIEF.md
+   Footer per docs/design-brief.md
    ========================================================================== */
 .footer {
   background-color: var(--color-deep-forest);

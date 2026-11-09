@@ -2,7 +2,7 @@
  * ReturnHer - Core Application & Routing
  * Vanilla JavaScript SPA with Hash-based routing, localStorage persistence,
  * and component state management.
- * Strictly adheres to BRIEF.md v2.
+ * Strictly adheres to docs/design-brief.md v2.
  */
 
 (function () {
@@ -24,7 +24,7 @@
   let sakhiTyping = false;
   let sakhiMessages = [];
 
-  // --- SVG Icons & Decorative Motifs (No 4-point sparkle star, no AI robot icons) ---
+  // --- SVG Icons & Decorative Motifs ---
   const ICONS = {
     marigold: `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="16" cy="16" r="5" fill="#D2401F"/>
@@ -359,7 +359,7 @@
           </ul>
         </div>
 
-        <!-- Plain text official portal names per BRIEF.md -->
+        <!-- Plain text official portal names per docs/design-brief.md -->
         <div style="padding: 20px 0; border-top: 1px solid rgba(255, 246, 229, 0.15); border-bottom: 1px solid rgba(255, 246, 229, 0.15); margin-bottom: 24px;">
           <p style="font-size: 15px; color: var(--color-marigold); margin-bottom: 6px; font-weight: 700;">
             ${t("footer.officialSources")}
@@ -2028,7 +2028,7 @@
             <span class="tag tag--opportunity" style="margin-bottom: 12px;">${t("tagline.sakhi")}</span>
             <h1 style="margin-bottom: 12px;">Sakhi Illustration Kit & Review Board</h1>
             <p style="font-size: 20px; color: var(--color-ink); max-width: 780px; margin: 0 auto;">
-              Complete vector art system generated entirely by code per <strong>BRIEF.md v2</strong>.
+              Complete vector art system generated entirely by code per <strong>docs/design-brief.md v2</strong>.
               Review every figure, prop, cultural motif, narrative scene, the hero crowd, and the framed textile panel on calm cream.
             </p>
           </div>
@@ -2150,7 +2150,7 @@
             <div style="margin-bottom: 24px;">
               <span class="tag tag--support">Figure Generator (ART.woman)</span>
               <h2 style="font-size: 32px; margin-top: 8px;">3. Women Diversity & Props System</h2>
-              <p style="font-size: 18px; color: var(--color-ink);">All 6 skin tones, hairstyles, props, and garments from BRIEF.md (never childlike, adult & dignified).</p>
+              <p style="font-size: 18px; color: var(--color-ink);">All 6 skin tones, hairstyles, props, and garments from docs/design-brief.md (never childlike, adult & dignified).</p>
             </div>
 
             <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px;">
@@ -2215,7 +2215,7 @@
             <div style="margin-bottom: 24px;">
               <span class="tag tag--education">Indian Motifs (ART.decor)</span>
               <h2 style="font-size: 32px; margin-top: 8px;">4. Decorative Cultural Motifs</h2>
-              <p style="font-size: 18px; color: var(--color-ink);">Rooted in festival courtyards (marigolds, paisleys, bangles, rangoli). <strong>Strictly no 4-point stars, no AI robots.</strong></p>
+              <p style="font-size: 18px; color: var(--color-ink);">Rooted in festival courtyards (marigolds, paisleys, bangles, rangoli). <strong>No 4-point stars or robots.</strong></p>
             </div>
 
             <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; text-align: center;">
@@ -2455,8 +2455,8 @@
     } else if (path === "#/kit") {
       renderKit();
     } else {
-      // Fallback
-      renderHome();
+      window.location.hash = "#/home";
+      return;
     }
 
     // Attach IntersectionObserver for .fade-up

@@ -44,7 +44,7 @@ Props: sewing machine, needle and spool, books, laptop, notebook, chai cup, cert
 
 ## Decorative motifs (Indian-rooted, not "tech")
 marigold flowers, paisley (kairi), lotus, stacked bangles, rangoli dot clusters, squiggles, hatch lines, dupatta waves, sun with rays, leaves, small birds.
-Do NOT use the 4-point sparkle star anywhere, and no robot, magic-wand or glow icons. They read as AI.
+Do NOT use the 4-point sparkle star anywhere, and no robot, magic-wand or glow icons.
 
 ## Motion (slow and gentle)
 Fade-up on scroll, figures sway slowly (6s), flowers rotate (40s), cards straighten on hover, journey lines draw themselves, saving something makes a marigold bloom with petals. All motion off under prefers-reduced-motion.
@@ -72,4 +72,3 @@ cta | Later can start today. | "बाद में" आज से शुरू 
 cta-sub | No rush. No judgment. Just your next step. | कोई जल्दी नहीं, कोई जजमेंट नहीं, बस अगला क़दम।
 sakhi | Sakhi hai na! | सखी है ना!
 footer | For every woman who ever said "maybe later". | हर उस महिला के लिए जिसने कभी कहा, "बाद में देखेंगे।"
-

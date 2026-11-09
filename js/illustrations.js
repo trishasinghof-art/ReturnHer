@@ -1,7 +1,7 @@
 /**
  * ReturnHer Illustration Kit (ART)
  * Generated entirely in inline vector SVG code - requires no image files.
- * Adheres strictly to BRIEF.md v2:
+ * Adheres strictly to docs/design-brief.md v2:
  * - 6 skin tones, 4 hair colors, adult and dignified proportions (never childlike).
  * - Cultural motifs: marigold, paisley (kairi), lotus, bangles, rangoli, squiggles, etc.
  * - Strictly NO 4-point sparkle star, robot, or magic wand.
@@ -12,7 +12,9 @@
 window.ART = (function () {
   "use strict";
 
-  // --- Palette from BRIEF.md ---
+  const REAL_ARTWORK_SLOTS = [];
+
+  // --- Palette from docs/design-brief.md ---
   const PALETTE = {
     forest: "#0E4B33",
     deepForest: "#0A2F21",
@@ -26,10 +28,10 @@ window.ART = (function () {
     oat: "#F1E8D8",
     ink: "#2A2622",
 
-    // Skin tones (BRIEF.md)
+    // Skin tones (docs/design-brief.md)
     skinTones: ["#F3D0B0", "#E0A877", "#C08052", "#94603A", "#6B4228", "#46291A"],
 
-    // Hair tones (BRIEF.md)
+    // Hair tones (docs/design-brief.md)
     hairTones: {
       black: "#1B1210",
       darkBrown: "#3A2418",
@@ -82,7 +84,7 @@ window.ART = (function () {
 
     switch (name) {
       case "marigold":
-        // 8-petal marigold flower per BRIEF.md
+        // 8-petal marigold flower per docs/design-brief.md
         return `<svg viewBox="0 0 64 64" width="${size}" height="${size}"${cls}${style} fill="none" aria-hidden="true">
           <ellipse cx="32" cy="14" rx="7" ry="11" fill="${color}" />
           <ellipse cx="32" cy="50" rx="7" ry="11" fill="${color}" />
@@ -1082,8 +1084,7 @@ window.ART = (function () {
   }
 
   // --- 9. ART.slot(name, alt, className) ---
-  // Renders the coded SVG first, then tries to load assets/illustrations/{name}.svg;
-  // If it loads, swaps it in. Enables dropping real artwork later with zero code change.
+  // Renders the coded SVG first. Only explicitly enabled slots load artwork overrides.
   function slot(name, alt = "", className = "") {
     const slotId = "art-slot-" + Math.random().toString(36).substring(2, 9);
     let codedSvg = "";
@@ -1123,8 +1124,7 @@ window.ART = (function () {
         codedSvg = decor("marigold", { size: 64 });
     }
 
-    // Schedule background check for external asset override
-    if (typeof window !== "undefined") {
+    if (REAL_ARTWORK_SLOTS.includes(name) && typeof window !== "undefined") {
       setTimeout(() => {
         const el = document.getElementById(slotId);
         if (!el) return;

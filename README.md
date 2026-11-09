@@ -1,30 +1,129 @@
 # ReturnHer
 
-ReturnHer is a bilingual prototype that helps women across India explore government-supported ways to continue studying, get skills certified, and earn. It shapes a personal path from a woman's education, skills, goal, and district. It is a guide to official sources, not a job portal or a government website.
+A local prototype for exploring education, skills, and earning pathways.
+
+ReturnHer helps women explore sample government-supported pathways using their education, skills, goal, state, and district. It is a bilingual prototype and does not represent a government service.
+
+Live demo: https://your-username.github.io/returnher/
+
+Built for Hackathon Name, Month 2026.
+
+![ReturnHer home page](assets/og-image.png)
+
+## Problem
+
+The prototype illustrates three fictional sample personas:
+
+- Priya is a postgraduate interested in research and a PhD.
+- Sunita has tailoring and embroidery experience and wants to certify her skills.
+- Anjali is returning to education and wants to continue her studies.
+
+## Features
+
+- English and Hindi interface with a remembered language choice.
+- Guided profile setup and sample personas.
+- Personalized pathway suggestions and opportunity search.
+- Opportunity details, eligibility guide, and application checklist.
+- Local saved items and application progress.
+- Scripted Sakhi helper with official source links.
 
 ## Run it
 
-Open `index.html` in a modern browser. There is no build step, package installation, sign-up service, or backend. The app uses hash routes and keeps demo profile, saved items, and progress in the browser's local storage.
+Clone the repository:
 
-## 60-second demo
+```text
+git clone https://github.com/trishasinghof-art/ReturnHer
+```
 
-1. Tap Sunita in the home illustration.
-2. Look through her personalized path.
-3. Open an opportunity and choose **Am I eligible?**
-4. Open the application guide and try its checklist or progress steps.
-5. Ask Sakhi a question.
-6. Switch to Hindi with the language button.
+Open `index.html` in a modern browser. Add `#/kit` to the URL to see the illustrations.
 
-The **Demo guide** button in the notice bar also shows these steps.
+## Stack
 
-## Illustrations
+HTML, CSS, vanilla JavaScript, hash routing, localStorage, inline SVG, and Google Fonts.
 
-The app draws its illustrations in SVG and can replace supported scenes with artwork in `assets/illustrations/`. To add an illustration, provide an SVG with the same filename as its slot, for example `scene-doorway.svg`, `scene-tailor.svg`, `scene-scholar.svg`, `scene-learner.svg`, `scene-teacher.svg`, `scene-entrepreneur.svg`, `scene-homeEarner.svg`, `hero-crowd.svg`, `cta-panel.svg`, or `sakhi.svg`. Keep the artwork flat, accessible, and consistent with the palette and dignity guidance in [BRIEF.md](./BRIEF.md). A missing or invalid override leaves the built-in illustration in place.
+## Matching
 
-## Prototype limitations
+```text
+Goal match: +3
+Skills match: +2
+Qualification meets minimum: +2
+State match or All India: +1
+Learning mode match: +1
+Funding preference matches eligible funding type: +1
 
-- Sign-in is demo-only; a name and answers are stored on this device.
-- Opportunity listings, requirements, and details are sample entries. Confirm current information with the linked official source.
-- There is no backend, account system, application submission, or server-side storage.
-- Matching and Sakhi answers use local, rule-based logic. They are not personalized professional advice and do not determine eligibility.
-- Sakhi does not use an external API. The official authority makes final eligibility decisions.
+Filter out opportunities requiring a higher qualification.
+Exclude distance and fully online PhD options because UGC rules do not permit them.
+```
+
+## Structure
+
+```text
+ReturnHer/
+├── .gitignore
+├── LICENSE
+├── README.md
+├── index.html
+├── assets/
+│   ├── favicon.svg
+│   ├── og-image.png
+│   └── illustrations/
+│       ├── .gitkeep
+│       ├── cta-panel.svg
+│       ├── hero-crowd.svg
+│       ├── sakhi.svg
+│       ├── scene-doorway.svg
+│       ├── scene-entrepreneur.svg
+│       ├── scene-homeEarner.svg
+│       ├── scene-learner.svg
+│       ├── scene-scholar.svg
+│       ├── scene-tailor.svg
+│       └── scene-teacher.svg
+├── css/
+│   └── styles.css
+├── docs/
+│   └── design-brief.md
+└── js/
+    ├── app.js
+    ├── data.js
+    ├── i18n.js
+    └── illustrations.js
+```
+
+## Sources
+
+- IGNOU: https://ignou.ac.in
+- National Institute of Open Schooling: https://nios.ac.in
+- National Scholarship Portal: https://scholarships.gov.in
+- UGC Distance Education Bureau: https://deb.ugc.ac.in
+- Common Fellowship Portal: https://fellowships.gov.in
+- National Career Service: https://ncs.gov.in
+- Skill India Digital: https://skillindiadigital.gov.in
+- Apprenticeship India: https://apprenticeshipindia.gov.in
+- PM Vishwakarma: https://pmvishwakarma.gov.in
+- MUDRA: https://mudra.org.in
+- Stand-Up India: https://standupmitra.in
+- Aajeevika: https://aajeevika.gov.in
+
+## Limitations
+
+- Sign-in is a demo flow; it does not authenticate users.
+- Opportunity data is sample data and has no dates or amounts.
+- Matching is rule-based.
+- Sakhi uses keyword-based responses and does not use an external service.
+- There is no backend.
+- No Aadhaar, phone number, or address is collected.
+- Answers stay in local browser storage and are never sent anywhere.
+
+## Roadmap
+
+- Add a verified opportunity database.
+- Add real authentication.
+- Include district-level centres.
+- Add more languages.
+- Validate the content with Jan Shikshan Sansthan (JSS) and self-help groups.
+
+## License
+
+MIT
+
+Built by Trisha Singh, Team Hopeless03.

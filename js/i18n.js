@@ -1,7 +1,7 @@
 /**
  * ReturnHer Internationalization (i18n)
  * Dual language support: English (en) and Hindi (hi).
- * Includes the full tagline bank and design copy from BRIEF.md.
+ * Includes the full tagline bank and design copy from docs/design-brief.md.
  */
 
 window.I18N = (function () {
@@ -9,7 +9,7 @@ window.I18N = (function () {
 
   const strings = {
     en: {
-      // --- Brand & Tagline Bank (from BRIEF.md) ---
+      // --- Brand & Tagline Bank (from docs/design-brief.md) ---
       "brand.name": "ReturnHer",
       "tagline.hero": "Your journey paused. Your opportunities didn't.",
       "tagline.short": "Begin again.",
@@ -100,7 +100,7 @@ window.I18N = (function () {
 
       // --- Maker Note ---
       "maker.title": "A note from the maker",
-      "maker.placeholder": "[Replace this with 2 lines in your own words: why you built ReturnHer.]",
+      "maker.placeholder": "As a woman, I feel one of my responsibilities is to build something that genuinely makes a difference in other women's lives. I built ReturnHer to help women rediscover their potential, access opportunities, and become financially and professionally independent.",
       "maker.signoff": "Handcrafted for Indian women restarting their journey",
 
       // --- Notices & Disclaimers ---
@@ -379,7 +379,7 @@ window.I18N = (function () {
     },
 
     hi: {
-      // --- Brand & Tagline Bank (from BRIEF.md) ---
+      // --- Brand & Tagline Bank (from docs/design-brief.md) ---
       "brand.name": "ReturnHer",
       "tagline.hero": "सफ़र रुका था, मौके नहीं।",
       "tagline.short": "फिर से शुरू।",
@@ -758,6 +758,8 @@ window.I18N = (function () {
   } catch (e) {
     console.warn("localStorage unavailable for i18n", e);
   }
+  document.documentElement.lang = currentLang;
+  document.documentElement.setAttribute("data-lang", currentLang);
 
   function getLanguage() {
     return currentLang;
