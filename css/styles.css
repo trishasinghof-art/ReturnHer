@@ -1,0 +1,1070 @@
+/* ==========================================================================
+   ReturnHer - Design System & CSS Foundation
+   Single source of truth: BRIEF.md v2
+   ========================================================================== */
+
+/* --- CSS Variables --- */
+:root {
+  /* Palette - Solid Fills Only, Never Gradients */
+  --color-forest: #0E4B33;
+  --color-deep-forest: #0A2F21;
+  --color-marigold: #FFC21A;
+  --color-vermilion: #D2401F;
+  --color-vermilion-bright: #E8512E;
+  --color-cobalt: #2B59D9;
+  --color-blush: #F6C1CF;
+  --color-rani: #D6336C;
+  --color-cream: #FFF6E5;
+  --color-oat: #F1E8D8;
+  --color-ink: #2A2622;
+
+  /* Pillars */
+  --pillar-education: #2B59D9;
+  --pillar-certification: #D2401F;
+  --pillar-opportunity: #FFC21A;
+  --pillar-support: #0E4B33;
+
+  /* Skin & Hair Palette */
+  --skin-1: #F3D0B0;
+  --skin-2: #E0A877;
+  --skin-3: #C08052;
+  --skin-4: #94603A;
+  --skin-5: #6B4228;
+  --skin-6: #46291A;
+
+  --hair-1: #1B1210;
+  --hair-2: #3A2418;
+  --hair-3: #6B3F25;
+  --hair-grey: #B9B4AE;
+
+  /* Typography */
+  --font-heading-en: "Fraunces", Georgia, serif;
+  --font-body-en: "Nunito Sans", system-ui, -apple-system, sans-serif;
+  --font-heading-hi: "Noto Serif Devanagari", "Fraunces", serif;
+  --font-body-hi: "Noto Sans Devanagari", "Nunito Sans", sans-serif;
+
+  --font-heading: var(--font-heading-en);
+  --font-body: var(--font-body-en);
+
+  /* Radius & Shapes */
+  --radius-pill: 9999px;
+  --radius-card: 28px;
+  --radius-arch: 140px 140px 28px 28px;
+  --radius-leaf: 56px 12px 56px 12px;
+  --radius-blob: 42% 58% 65% 35% / 45% 40% 60% 55%;
+
+  /* Spacing */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 40px;
+  --space-xl: 64px;
+  --space-2xl: 96px;
+  --container-max: 1240px;
+}
+
+/* Hindi Typography Overrides */
+html[lang="hi"] {
+  --font-heading: var(--font-heading-hi);
+  --font-body: var(--font-body-hi);
+}
+
+/* Reset & Global Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--color-ink);
+  background-color: var(--color-cream);
+  overflow-x: clip; /* Strict: Never horizontal scroll */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Accessibility Focus Ring */
+:focus-visible {
+  outline: 3px solid var(--color-vermilion);
+  outline-offset: 3px;
+}
+
+[tabindex="0"]:focus-visible {
+  outline: 3px solid var(--color-vermilion);
+  outline-offset: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Typography Rules per BRIEF.md */
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-variation-settings: "opsz" 72, "wght" 800, "SOFT" 100, "WONK" 0;
+  line-height: 1.05;
+  text-transform: none; /* Strict: No all-caps shouting */
+  color: var(--color-forest);
+}
+
+html[lang="hi"] h1,
+html[lang="hi"] h2,
+html[lang="hi"] h3,
+html[lang="hi"] h4 {
+  line-height: 1.35;
+}
+
+h1 {
+  font-size: clamp(44px, 7vw, 84px);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: clamp(34px, 4.5vw, 56px);
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: clamp(24px, 3vw, 36px);
+}
+
+h4 {
+  font-size: clamp(20px, 2.2vw, 26px);
+}
+
+p, li, input, select, textarea {
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+small {
+  font-size: 15px; /* Strict: Nothing below 15px */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img, svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* --- Contrast Rules from BRIEF.md ---
+   ink on cream, oat, marigold, blush.
+   cream on forest, cobalt, vermilion.
+   Never cream on marigold; never marigold text on cream.
+*/
+.text-ink { color: var(--color-ink) !important; }
+.text-cream { color: var(--color-cream) !important; }
+.text-forest { color: var(--color-forest) !important; }
+.text-vermilion { color: var(--color-vermilion) !important; }
+.text-cobalt { color: var(--color-cobalt) !important; }
+.text-marigold { color: var(--color-marigold) !important; }
+
+/* Hand-drawn SVG highlight word underline/circle */
+.highlight-word {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.highlight-word svg {
+  position: absolute;
+  left: -4%;
+  bottom: -6px;
+  width: 108%;
+  height: 14px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* ==========================================================================
+   Shared Prototype Banner
+   ========================================================================== */
+.prototype-banner {
+  background-color: var(--color-deep-forest);
+  color: var(--color-cream);
+  padding: 10px 16px;
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: center;
+  position: relative;
+  z-index: 100;
+  border-bottom: 2px solid var(--color-marigold);
+}
+
+.prototype-banner p {
+  font-size: 15px;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Navbar
+   ========================================================================== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  background-color: var(--color-cream);
+  border-bottom: 2px solid var(--color-oat);
+  transition: transform 0.25s ease;
+}
+
+.navbar-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 800;
+  font-variation-settings: "opsz" 72, "wght" 800, "SOFT" 100;
+  color: var(--color-forest);
+  text-decoration: none;
+}
+
+.navbar-brand .brand-flower {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  animation: rotateFlower 40s linear infinite;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.navbar-links a {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-forest);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+  background-color: var(--color-oat);
+  color: var(--color-vermilion);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lang-toggle-btn {
+  background: transparent;
+  border: 2px solid var(--color-forest);
+  color: var(--color-forest);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-toggle-btn:hover {
+  background: var(--color-forest);
+  color: var(--color-cream);
+}
+
+.navbar-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--color-forest);
+}
+
+/* ==========================================================================
+   Reusable Components
+   ========================================================================== */
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  user-select: none;
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+/* Primary: Forest -> Hover Vermilion */
+.btn-primary {
+  background-color: var(--color-forest);
+  color: var(--color-cream);
+  border-color: var(--color-forest);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-vermilion);
+  border-color: var(--color-vermilion);
+  color: var(--color-cream);
+}
+
+/* On-Dark: Cream -> Hover Marigold with Ink */
+.btn-on-dark {
+  background-color: var(--color-cream);
+  color: var(--color-forest);
+  border-color: var(--color-cream);
+}
+
+.btn-on-dark:hover {
+  background-color: var(--color-marigold);
+  border-color: var(--color-marigold);
+  color: var(--color-ink);
+}
+
+/* Outline: transparent border currentColor */
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-forest);
+  border-color: var(--color-forest);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-forest);
+  color: var(--color-cream);
+}
+
+.btn-outline-dark {
+  background-color: transparent;
+  color: var(--color-cream);
+  border-color: var(--color-cream);
+}
+
+.btn-outline-dark:hover {
+  background-color: var(--color-cream);
+  color: var(--color-forest);
+}
+
+/* Marigold Button */
+.btn-marigold {
+  background-color: var(--color-marigold);
+  color: var(--color-ink);
+  border-color: var(--color-marigold);
+}
+
+.btn-marigold:hover {
+  background-color: var(--color-vermilion);
+  border-color: var(--color-vermilion);
+  color: var(--color-cream);
+}
+
+/* Small Button */
+.btn-sm {
+  padding: 8px 18px;
+  font-size: 16px;
+}
+
+/* --- Cards & Shapes --- */
+.card {
+  position: relative;
+  background-color: var(--color-cream);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  border: 2px solid var(--color-ink);
+  /* Strict: NO shadows and NO gradients in UI */
+  box-shadow: none;
+  transition: transform 0.25s ease;
+}
+
+.card--oat {
+  background-color: var(--color-oat);
+}
+
+.card--blush {
+  background-color: var(--color-blush);
+}
+
+.card--marigold {
+  background-color: var(--color-marigold);
+  color: var(--color-ink);
+}
+
+.card--forest {
+  background-color: var(--color-forest);
+  color: var(--color-cream);
+  border-color: var(--color-deep-forest);
+}
+
+.card--forest h1,
+.card--forest h2,
+.card--forest h3,
+.card--forest h4 {
+  color: var(--color-cream);
+}
+
+/* Card Tilts */
+.card--tilt-left {
+  transform: rotate(-2.5deg);
+}
+
+.card--tilt-left:hover {
+  transform: rotate(0deg);
+}
+
+.card--tilt-right {
+  transform: rotate(2.5deg);
+}
+
+.card--tilt-right:hover {
+  transform: rotate(0deg);
+}
+
+/* Flat Offset Block Behind via ::before */
+.block-behind {
+  position: relative;
+  z-index: 1;
+}
+
+.block-behind::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-marigold);
+  border-radius: inherit;
+  border: 2px solid var(--color-ink);
+  transform: translate(12px, 12px);
+  z-index: -1;
+  transition: transform 0.25s ease;
+}
+
+.block-behind:hover::before {
+  transform: translate(6px, 6px);
+}
+
+.block-behind--forest::before {
+  background-color: var(--color-forest);
+}
+
+.block-behind--vermilion::before {
+  background-color: var(--color-vermilion);
+}
+
+.block-behind--cobalt::before {
+  background-color: var(--color-cobalt);
+}
+
+.block-behind--blush::before {
+  background-color: var(--color-blush);
+}
+
+.block-behind--oat::before {
+  background-color: var(--color-oat);
+}
+
+.block-behind--marigold::before {
+  background-color: var(--color-marigold);
+}
+
+/* Shapes */
+.shape-arch {
+  border-radius: var(--radius-arch);
+}
+
+.shape-leaf {
+  border-radius: var(--radius-leaf);
+}
+
+.shape-blob {
+  border-radius: var(--radius-blob);
+}
+
+.shape-circle {
+  border-radius: 50%;
+}
+
+.shape-pill {
+  border-radius: var(--radius-pill);
+}
+
+/* Paper Note with Washi Tape Strip */
+.note {
+  position: relative;
+  background-color: #FFFDF4;
+  border: 2px solid #D8CEB9;
+  border-radius: 8px;
+  padding: 32px 24px 24px;
+  transform: rotate(-1.5deg);
+  transition: transform 0.2s ease;
+}
+
+.note:hover {
+  transform: rotate(0deg);
+}
+
+.note::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(1deg);
+  width: 90px;
+  height: 24px;
+  background-color: rgba(255, 194, 26, 0.75);
+  border: 1px dashed rgba(42, 38, 34, 0.3);
+  z-index: 2;
+}
+
+/* Tags and Chips */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--color-ink);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.tag--education {
+  background-color: var(--color-cobalt);
+  color: var(--color-cream);
+  border-color: var(--color-cobalt);
+}
+
+.tag--certification {
+  background-color: var(--color-vermilion);
+  color: var(--color-cream);
+  border-color: var(--color-vermilion);
+}
+
+.tag--opportunity {
+  background-color: var(--color-marigold);
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+.tag--support {
+  background-color: var(--color-forest);
+  color: var(--color-cream);
+  border-color: var(--color-forest);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-oat);
+  color: var(--color-ink);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chip:hover,
+.chip.active {
+  background-color: var(--color-marigold);
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+}
+
+/* Heart Save Button */
+.heart-btn {
+  background: var(--color-cream);
+  border: 2px solid var(--color-ink);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.heart-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 2.2;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.heart-btn:hover {
+  transform: scale(1.08);
+  background-color: var(--color-blush);
+}
+
+.heart-btn.saved {
+  background-color: var(--color-blush);
+  border-color: var(--color-rani);
+}
+
+.heart-btn.saved svg {
+  fill: var(--color-rani);
+  stroke: var(--color-rani);
+  animation: bloomHeart 0.4s ease;
+}
+
+@keyframes bloomHeart {
+  0% { transform: scale(0.6); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   Section Dividers (SVG wavy / scalloped / arched edges)
+   ========================================================================== */
+.divider {
+  width: 100%;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.divider svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 48px;
+}
+
+.divider--flip {
+  transform: rotate(180deg);
+}
+
+/* ==========================================================================
+   Toast Notification
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background-color: var(--color-deep-forest);
+  color: var(--color-cream);
+  border: 2px solid var(--color-marigold);
+  border-radius: var(--radius-pill);
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: none;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Bottom Sheet Modal
+   ========================================================================== */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(10, 47, 33, 0.65);
+  z-index: 900;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.25s ease;
+}
+
+.sheet {
+  background-color: var(--color-cream);
+  border-top-left-radius: 36px;
+  border-top-right-radius: 36px;
+  border: 3px solid var(--color-ink);
+  border-bottom: none;
+  width: 100%;
+  max-width: 760px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 40px 32px 32px;
+  position: relative;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sheet-handle {
+  width: 56px;
+  height: 6px;
+  background-color: var(--color-ink);
+  border-radius: var(--radius-pill);
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sheet-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: var(--color-oat);
+  border: 2px solid var(--color-ink);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ==========================================================================
+   Motion & Animation per BRIEF.md
+   Slow and gentle: figures sway (6s), flowers rotate (40s), etc.
+   ========================================================================== */
+.fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sway-slow {
+  animation: swayFigure 6s ease-in-out infinite alternate;
+}
+
+@keyframes swayFigure {
+  0% { transform: rotate(-1.5deg); }
+  100% { transform: rotate(1.5deg); }
+}
+
+@keyframes rotateFlower {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Bloom burst celebration animation */
+@keyframes bloomBurst {
+  0% { transform: scale(0.6) rotate(0deg); opacity: 0.6; }
+  50% { transform: scale(1.3) rotate(30deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.bloom-group {
+  animation: bloomBurst 0.6s ease;
+}
+
+/* Art Slots & Heroine Interactive Links */
+.art-slot {
+  display: block;
+  width: 100%;
+  line-height: 0;
+}
+
+.art-slot svg,
+.art-slot img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.heroine-group {
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.heroine-group:hover,
+.heroine-group:focus-visible {
+  transform: scale(1.05);
+}
+
+/* Prefers-Reduced-Motion: ALL motion off strictly per BRIEF.md */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .card--tilt-left, .card--tilt-right, .note, .sway-slow, .heroine-group {
+    transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   Layout Containers & Section Themes
+   Ordered: forest, cream, oat, blush, forest, cream, marigold, deep-forest
+   ========================================================================== */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: var(--space-xl) 0;
+  position: relative;
+}
+
+.section-forest {
+  background-color: var(--color-forest);
+  color: var(--color-cream);
+}
+
+.section-forest h1,
+.section-forest h2,
+.section-forest h3,
+.section-forest h4 {
+  color: var(--color-cream);
+}
+
+.section-cream {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+}
+
+.section-oat {
+  background-color: var(--color-oat);
+  color: var(--color-ink);
+}
+
+.section-blush {
+  background-color: var(--color-blush);
+  color: var(--color-ink);
+}
+
+.section-marigold {
+  background-color: var(--color-marigold);
+  color: var(--color-ink);
+}
+
+.section-deep-forest {
+  background-color: var(--color-deep-forest);
+  color: var(--color-cream);
+}
+
+/* Staggered Grid & Asymmetry */
+.grid-staggered {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 36px;
+  align-items: start;
+}
+
+.grid-staggered > :nth-child(even) {
+  transform: translateY(32px);
+}
+
+/* Split 7/5 Asymmetric Layout */
+.layout-7-5 {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 48px;
+  align-items: center;
+}
+
+/* ==========================================================================
+   Footer per BRIEF.md
+   ========================================================================== */
+.footer {
+  background-color: var(--color-deep-forest);
+  color: var(--color-cream);
+  padding: var(--space-xl) 0 var(--space-lg);
+  position: relative;
+  border-top: 3px solid var(--color-marigold);
+}
+
+.footer-content {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.footer-brand h2 {
+  color: var(--color-cream);
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.footer-tagline {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  color: var(--color-marigold);
+  font-style: italic;
+  max-width: 480px;
+  line-height: 1.4;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+}
+
+.footer-links a {
+  color: var(--color-cream);
+  font-size: 17px;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--color-marigold);
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 246, 229, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 15px;
+  color: rgba(255, 246, 229, 0.85);
+}
+
+.footer-bottom p {
+  font-size: 15px;
+}
+
+/* ==========================================================================
+   Responsive Rules
+   ========================================================================== */
+@media (max-width: 860px) {
+  .navbar-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--color-cream);
+    flex-direction: column;
+    padding: 24px;
+    border-bottom: 2px solid var(--color-ink);
+    gap: 16px;
+  }
+
+  .navbar-links.open {
+    display: flex;
+  }
+
+  .navbar-hamburger {
+    display: block;
+  }
+
+  .layout-7-5 {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .grid-staggered > :nth-child(even) {
+    transform: none;
+  }
+
+  .card {
+    padding: 24px;
+  }
+
+  .card--tilt-left,
+  .card--tilt-right {
+    transform: none;
+  }
+
+  .block-behind::before {
+    transform: translate(6px, 6px);
+  }
+}

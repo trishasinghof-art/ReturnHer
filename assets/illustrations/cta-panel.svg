@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 420" width="100%" height="100%">
+  <!-- Plain cream background -->
+  <rect width="1100" height="420" fill="#FFF6E5" />
+
+  <!-- Outer Frame & Forest Green Base -->
+  <rect x="25" y="25" width="1050" height="370" rx="32" fill="#0E4B33" stroke="#FFC21A" stroke-width="4" />
+  <rect x="35" y="35" width="1030" height="350" rx="24" fill="none" stroke="#FFF6E5" stroke-width="2" stroke-dasharray="6 6" />
+
+  <!-- Corner Marigold blossoms (extending beyond frame) -->
+  <!-- Top Left -->
+  <g transform="translate(10, 10)">
+    <ellipse cx="25" cy="10" rx="7" ry="11" fill="#FFC21A" />
+    <ellipse cx="25" cy="40" rx="7" ry="11" fill="#FFC21A" />
+    <ellipse cx="10" cy="25" rx="11" ry="7" fill="#FFC21A" />
+    <ellipse cx="40" cy="25" rx="11" ry="7" fill="#FFC21A" />
+    <circle cx="25" cy="25" r="9" fill="#D2401F" />
+    <circle cx="25" cy="25" r="5" fill="#FFC21A" />
+  </g>
+  <!-- Top Right -->
+  <g transform="translate(1040, 10)">
+    <ellipse cx="25" cy="10" rx="7" ry="11" fill="#FFC21A" />
+    <ellipse cx="25" cy="40" rx="7" ry="11" fill="#FFC21A" />
+    <ellipse cx="10" cy="25" rx="11" ry="7" fill="#FFC21A" />
+    <ellipse cx="40" cy="25" rx="11" ry="7" fill="#FFC21A" />
+    <circle cx="25" cy="25" r="9" fill="#D2401F" />
+    <circle cx="25" cy="25" r="5" fill="#FFC21A" />
+  </g>
+  <!-- Bottom Left -->
+  <g transform="translate(10, 360)">
+    <ellipse cx="25" cy="10" rx="7" ry="11" fill="#FFC21A" />
+    <ellipse cx="25" cy="40" rx="7" ry="11" fill="#FFC21A" />
+    <ellipse cx="10" cy="25" rx="11" ry="7" fill="#FFC21A" />
+    <ellipse cx="40" cy="25" rx="11" ry="7" fill="#FFC21A" />
+    <circle cx="25" cy="25" r="9" fill="#D2401F" />
+    <circle cx="25" cy="25" r="5" fill="#FFC21A" />
+  </g>
+  <!-- Bottom Right -->
+  <g transform="translate(1040, 360)">
+    <ellipse cx="25" cy="10" rx="7" ry="11" fill="#FFC21A" />
+    <ellipse cx="25" cy="40" rx="7" ry="11" fill="#FFC21A" />
+    <ellipse cx="10" cy="25" rx="11" ry="7" fill="#FFC21A" />
+    <ellipse cx="40" cy="25" rx="11" ry="7" fill="#FFC21A" />
+    <circle cx="25" cy="25" r="9" fill="#D2401F" />
+    <circle cx="25" cy="25" r="5" fill="#FFC21A" />
+  </g>
+
+  <!-- Center Top and Bottom Blossoms -->
+  <g transform="translate(525, 0)">
+    <ellipse cx="25" cy="10" rx="8" ry="12" fill="#FFC21A" />
+    <ellipse cx="25" cy="40" rx="8" ry="12" fill="#FFC21A" />
+    <ellipse cx="10" cy="25" rx="12" ry="8" fill="#FFC21A" />
+    <ellipse cx="40" cy="25" rx="12" ry="8" fill="#FFC21A" />
+    <circle cx="25" cy="25" r="10" fill="#D2401F" />
+    <circle cx="25" cy="25" r="5" fill="#FFC21A" />
+  </g>
+  <g transform="translate(525, 370)">
+    <ellipse cx="25" cy="10" rx="8" ry="12" fill="#FFC21A" />
+    <ellipse cx="25" cy="40" rx="8" ry="12" fill="#FFC21A" />
+    <ellipse cx="10" cy="25" rx="12" ry="8" fill="#FFC21A" />
+    <ellipse cx="40" cy="25" rx="12" ry="8" fill="#FFC21A" />
+    <circle cx="25" cy="25" r="10" fill="#D2401F" />
+    <circle cx="25" cy="25" r="5" fill="#FFC21A" />
+  </g>
+
+  <!-- Left and Right Paisleys (Kairi) -->
+  <g transform="translate(70, 160)">
+    <path d="M26,60 C12,60 5,48 5,34 C5,19 18,10 30,3 C31,10 29,19 21,24 C16,27 15,30 15,35 C15,42 20,49 28,49 C36,49 42,43 42,35 C42,29 37,24 34,21 C37,16 43,13 47,13 C47,26 47,60 26,60 Z" fill="#FFC21A" />
+    <circle cx="27" cy="37" r="4" fill="#D2401F" />
+  </g>
+  <g transform="translate(980, 160) scale(-1, 1)">
+    <path d="M26,60 C12,60 5,48 5,34 C5,19 18,10 30,3 C31,10 29,19 21,24 C16,27 15,30 15,35 C15,42 20,49 28,49 C36,49 42,43 42,35 C42,29 37,24 34,21 C37,16 43,13 47,13 C47,26 47,60 26,60 Z" fill="#FFC21A" />
+    <circle cx="27" cy="37" r="4" fill="#D2401F" />
+  </g>
+
+  <!-- Stacked Bangles (Left & Right) -->
+  <g transform="translate(180, 70)">
+    <circle cx="25" cy="25" r="20" stroke="#D6336C" stroke-width="4" fill="none" />
+    <circle cx="29" cy="29" r="20" stroke="#FFC21A" stroke-width="4" fill="none" />
+    <circle cx="33" cy="33" r="20" stroke="#2B59D9" stroke-width="4" fill="none" />
+  </g>
+  <g transform="translate(860, 70)">
+    <circle cx="25" cy="25" r="20" stroke="#D6336C" stroke-width="4" fill="none" />
+    <circle cx="29" cy="29" r="20" stroke="#FFC21A" stroke-width="4" fill="none" />
+    <circle cx="33" cy="33" r="20" stroke="#2B59D9" stroke-width="4" fill="none" />
+  </g>
+
+  <!-- Traditional Squiggle wave bands -->
+  <g transform="translate(320, 55)">
+    <path d="M4,12 C16,2 28,22 40,12 C52,2 64,22 76,12 C88,2 100,22 112,12" stroke="#FFC21A" stroke-width="3.5" stroke-linecap="round" fill="none" />
+  </g>
+  <g transform="translate(680, 55)">
+    <path d="M4,12 C16,2 28,22 40,12 C52,2 64,22 76,12 C88,2 100,22 112,12" stroke="#FFC21A" stroke-width="3.5" stroke-linecap="round" fill="none" />
+  </g>
+  <g transform="translate(320, 350)">
+    <path d="M4,12 C16,2 28,22 40,12 C52,2 64,22 76,12 C88,2 100,22 112,12" stroke="#FFC21A" stroke-width="3.5" stroke-linecap="round" fill="none" />
+  </g>
+  <g transform="translate(680, 350)">
+    <path d="M4,12 C16,2 28,22 40,12 C52,2 64,22 76,12 C88,2 100,22 112,12" stroke="#FFC21A" stroke-width="3.5" stroke-linecap="round" fill="none" />
+  </g>
+
+  <!-- Central Festive Rangoli and Birds of Hope -->
+  <g transform="translate(380, 180)">
+    <path d="M4,16 C8,10 16,8 24,10 C28,6 34,4 38,5 C35,10 33,14 31,18 C23,22 14,22 8,19 Z" fill="#FFF6E5" />
+    <circle cx="33" cy="8" r="1.5" fill="#D2401F" />
+  </g>
+  <g transform="translate(670, 180) scale(-1, 1)">
+    <path d="M4,16 C8,10 16,8 24,10 C28,6 34,4 38,5 C35,10 33,14 31,18 C23,22 14,22 8,19 Z" fill="#FFF6E5" />
+    <circle cx="33" cy="8" r="1.5" fill="#D2401F" />
+  </g>
+
+  <!-- Central Rangoli Diamond & Dots -->
+  <g transform="translate(525, 175)">
+    <circle cx="25" cy="25" r="22" stroke="#FFC21A" stroke-width="1.8" stroke-dasharray="3 3" fill="none" />
+    <rect x="17" y="17" width="16" height="16" transform="rotate(45 25 25)" stroke="#F6C1CF" stroke-width="2" fill="none" />
+    <circle cx="25" cy="25" r="6" fill="#FFC21A" />
+    <circle cx="25" cy="6" r="3" fill="#D2401F" />
+    <circle cx="25" cy="44" r="3" fill="#D2401F" />
+    <circle cx="6" cy="25" r="3" fill="#D2401F" />
+    <circle cx="44" cy="25" r="3" fill="#D2401F" />
+  </g>
+</svg>

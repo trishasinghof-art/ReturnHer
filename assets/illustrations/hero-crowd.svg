@@ -1,0 +1,297 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 540" width="100%" height="100%">
+  <!-- Plain cream background -->
+  <rect width="1440" height="540" fill="#FFF6E5" />
+
+  <!-- Background organic textile blocks -->
+  <path d="M-60,180 C120,90 260,110 380,200 C500,290 460,450 320,510 C180,570 -20,530 -60,370 Z" fill="#F1E8D8" />
+  <path d="M1060,160 C1180,70 1340,100 1450,190 C1560,280 1530,440 1400,500 C1270,560 1100,510 1050,340 Z" fill="#F6C1CF" />
+
+  <!-- Floating cultural motifs (marigolds, paisleys, birds, dots) -->
+  <g transform="translate(120, 60)">
+    <ellipse cx="20" cy="8" rx="5" ry="8" fill="#FFC21A" />
+    <ellipse cx="20" cy="32" rx="5" ry="8" fill="#FFC21A" />
+    <ellipse cx="8" cy="20" rx="8" ry="5" fill="#FFC21A" />
+    <ellipse cx="32" cy="20" rx="8" ry="5" fill="#FFC21A" />
+    <circle cx="20" cy="20" r="7" fill="#D2401F" />
+    <circle cx="20" cy="20" r="4" fill="#FFC21A" />
+  </g>
+  <g transform="translate(1320, 70)">
+    <ellipse cx="20" cy="8" rx="5" ry="8" fill="#FFC21A" />
+    <ellipse cx="20" cy="32" rx="5" ry="8" fill="#FFC21A" />
+    <ellipse cx="8" cy="20" rx="8" ry="5" fill="#FFC21A" />
+    <ellipse cx="32" cy="20" rx="8" ry="5" fill="#FFC21A" />
+    <circle cx="20" cy="20" r="7" fill="#D2401F" />
+    <circle cx="20" cy="20" r="4" fill="#FFC21A" />
+  </g>
+  <g transform="translate(260, 80)">
+    <!-- Small bird -->
+    <path d="M6,20 C12,14 22,10 32,12 C36,8 42,4 48,6 C44,12 42,18 40,22 C30,28 18,28 10,24 Z" fill="#0E4B33" />
+    <circle cx="42" cy="10" r="1.5" fill="#FFF6E5" />
+  </g>
+  <g transform="translate(1160, 75)">
+    <!-- Paisley -->
+    <path d="M24,55 C10,55 4,44 4,30 C4,16 16,8 26,2 C28,8 26,16 18,22 C14,24 12,28 12,32 C12,38 16,46 24,46 C32,46 38,40 38,32 C38,26 34,22 30,18 C34,14 40,10 44,10 C44,22 44,55 24,55 Z" fill="#D2401F" />
+  </g>
+  <!-- Rangoli dots in mid area -->
+  <g transform="translate(680, 50)" fill="#FFC21A">
+    <circle cx="10" cy="10" r="3" />
+    <circle cx="30" cy="10" r="3" />
+    <circle cx="50" cy="10" r="3" />
+    <circle cx="10" cy="30" r="3" fill="#D2401F" />
+    <circle cx="30" cy="30" r="4" fill="#0E4B33" />
+    <circle cx="50" cy="30" r="3" fill="#D2401F" />
+    <circle cx="10" cy="50" r="3" />
+    <circle cx="30" cy="50" r="3" />
+    <circle cx="50" cy="50" r="3" />
+  </g>
+
+  <!-- ================= NINE OVERLAPPING WOMEN ================= -->
+
+  <!-- 1. FAR LEFT (TALLER): Elder woman standing with walking cane -->
+  <g transform="translate(30, 80) scale(1.35)">
+    <!-- Saree skirt -->
+    <path d="M40,130 L95,130 C100,180 102,230 98,280 L38,280 C34,230 36,180 40,130 Z" fill="#0E4B33" />
+    <path d="M38,272 L98,272 L98,280 L38,280 Z" fill="#FFC21A" />
+    <!-- Blouse & Torso -->
+    <path d="M44,104 L90,104 L94,136 L40,136 Z" fill="#0E4B33" />
+    <path d="M40,136 L88,104 L94,116 L46,146 Z" fill="#FFC21A" />
+    <!-- Neck -->
+    <rect x="62" y="80" width="10" height="26" fill="#94603A" />
+    <!-- Head -->
+    <circle cx="67" cy="62" r="19" fill="#94603A" />
+    <!-- Grey Hair Bun -->
+    <circle cx="67" cy="40" r="12" fill="#B9B4AE" />
+    <path d="M48,62 C48,46 56,44 67,44 C78,44 86,46 86,62 C82,50 74,48 67,48 C60,48 52,50 48,62 Z" fill="#B9B4AE" />
+    <!-- Dignified Smile & Eyes -->
+    <path d="M59,62 Q63,65 67,62" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M71,62 Q75,65 79,62" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M64,72 Q67,76 71,72" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <!-- Glasses -->
+    <circle cx="62" cy="62" r="6" stroke="#2A2622" stroke-width="1.5" fill="none" />
+    <circle cx="73" cy="62" r="6" stroke="#2A2622" stroke-width="1.5" fill="none" />
+    <line x1="68" y1="62" x2="67" y2="62" stroke="#2A2622" stroke-width="1.5" />
+    <!-- Arm holding cane -->
+    <path d="M88,104 L102,152 L94,154 L82,112 Z" fill="#0E4B33" />
+    <circle cx="100" cy="156" r="6" fill="#94603A" />
+    <!-- Walking Cane -->
+    <path d="M100,154 L106,280 M100,154 C100,144 110,144 110,150" stroke="#2A2622" stroke-width="3.5" stroke-linecap="round" fill="none" />
+  </g>
+
+  <!-- 2. LEFT: Woman in Wheelchair with marigold wheels -->
+  <g transform="translate(190, 160) scale(1.15)">
+    <!-- Wheelchair Frame & Large Wheel -->
+    <circle cx="65" cy="205" r="48" stroke="#FFC21A" stroke-width="6" fill="none" />
+    <circle cx="65" cy="205" r="42" stroke="#D2401F" stroke-width="1.5" fill="none" />
+    <circle cx="65" cy="205" r="8" fill="#2A2622" />
+    <!-- Spokes -->
+    <line x1="65" y1="157" x2="65" y2="253" stroke="#FFC21A" stroke-width="2" />
+    <line x1="17" y1="205" x2="113" y2="205" stroke="#FFC21A" stroke-width="2" />
+    <line x1="31" y1="171" x2="99" y2="239" stroke="#FFC21A" stroke-width="2" />
+    <line x1="31" y1="239" x2="99" y2="171" stroke="#FFC21A" stroke-width="2" />
+    <!-- Small front castor -->
+    <circle cx="120" cy="242" r="12" fill="#2A2622" />
+    <!-- Seat & Backrest -->
+    <path d="M35,160 L45,215 L105,215" stroke="#2A2622" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <!-- Woman sitting in cobalt kurta -->
+    <path d="M48,155 L90,155 L105,215 L45,215 Z" fill="#2B59D9" />
+    <rect x="58" y="115" width="28" height="42" rx="4" fill="#2B59D9" />
+    <!-- Salwar legs -->
+    <path d="M65,215 L115,215 L120,240 L105,240 Z" fill="#F1E8D8" />
+    <!-- Neck & Head -->
+    <rect x="68" y="94" width="8" height="22" fill="#E0A877" />
+    <circle cx="72" cy="80" r="17" fill="#E0A877" />
+    <circle cx="72" cy="62" r="10" fill="#1B1210" />
+    <path d="M55,80 C55,64 64,63 72,63 C80,63 89,64 89,80 C85,70 78,68 72,68 C66,68 59,70 55,80 Z" fill="#1B1210" />
+    <!-- Radiant smile -->
+    <path d="M65,80 Q68,83 71,80" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M75,80 Q78,83 81,80" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M68,89 Q72,93 76,89" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <circle cx="72" cy="74" r="1.8" fill="#D2401F" />
+    <!-- Hand resting on wheel rim with bangles -->
+    <circle cx="55" cy="180" r="5" fill="#E0A877" />
+    <rect x="52" y="174" width="6" height="3" fill="#D6336C" />
+  </g>
+
+  <!-- 3. SUNITA: Master Tailor with needle & thread spool -->
+  <g transform="translate(350, 150) scale(1.22)">
+    <!-- Emerald saree with vermilion pleats -->
+    <path d="M42,130 L96,130 C102,180 104,225 100,270 L38,270 C34,225 36,180 42,130 Z" fill="#0E4B33" />
+    <line x1="62" y1="130" x2="62" y2="268" stroke="#D2401F" stroke-width="2.5" />
+    <line x1="68" y1="130" x2="68" y2="268" stroke="#D2401F" stroke-width="2.5" />
+    <path d="M38,264 L100,264 L100,270 L38,270 Z" fill="#FFC21A" />
+    <!-- Blouse & draped pallu -->
+    <path d="M46,104 L90,104 L94,136 L42,136 Z" fill="#D2401F" />
+    <path d="M42,136 L88,104 L94,116 L46,146 Z" fill="#0E4B33" />
+    <!-- Neck & Head -->
+    <rect x="64" y="80" width="10" height="26" fill="#E0A877" />
+    <circle cx="69" cy="62" r="18" fill="#E0A877" />
+    <!-- Long side braid -->
+    <path d="M51,62 C51,44 60,42 69,42 C78,42 87,44 87,62 C83,50 76,48 69,48 C62,48 55,50 51,62 Z" fill="#1B1210" />
+    <ellipse cx="50" cy="76" rx="5" ry="7" fill="#1B1210" />
+    <ellipse cx="48" cy="88" rx="4.5" ry="6.5" fill="#1B1210" />
+    <ellipse cx="46" cy="100" rx="4" ry="6" fill="#1B1210" />
+    <ellipse cx="44" cy="110" rx="2.5" ry="3.5" fill="#D2401F" />
+    <!-- Joyful laughing eyes & smile -->
+    <path d="M62,61 Q65,65 68,61" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M72,61 Q75,65 78,61" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M65,71 Q69,76 74,71" stroke="#2A2622" stroke-width="2" fill="none" stroke-linecap="round" />
+    <circle cx="69" cy="55" r="2" fill="#D2401F" />
+    <!-- Hands holding thread spool & needle -->
+    <circle cx="92" cy="145" r="5.5" fill="#E0A877" />
+    <rect x="88" y="138" width="8" height="14" rx="2" fill="#FFC21A" />
+    <line x1="88" y1="142" x2="96" y2="142" stroke="#D2401F" stroke-width="1.5" />
+    <line x1="88" y1="147" x2="96" y2="147" stroke="#D2401F" stroke-width="1.5" />
+    <!-- Thread curving to needle -->
+    <path d="M92,138 C88,120 74,124 60,136" stroke="#D2401F" stroke-width="1.5" stroke-dasharray="2 2" fill="none" />
+    <line x1="56" y1="140" x2="66" y2="132" stroke="#B9B4AE" stroke-width="2" stroke-linecap="round" />
+    <!-- Bangles on wrists -->
+    <rect x="88" y="148" width="6" height="3" fill="#D6336C" />
+  </g>
+
+  <!-- 4. MID-LEFT: Woman laughing together with friend, blush dupatta -->
+  <g transform="translate(480, 160) scale(1.15)">
+    <path d="M44,125 L92,125 L98,260 L38,260 Z" fill="#D2401F" />
+    <rect x="52" y="98" width="32" height="34" rx="4" fill="#D2401F" />
+    <!-- Flowing blush dupatta -->
+    <path d="M42,98 C56,118 84,118 98,98 C106,128 104,180 98,210 L90,210 C94,180 94,135 88,110 C74,124 58,124 48,110 C42,135 44,180 48,210 L40,210 C34,180 34,128 42,98 Z" fill="#F6C1CF" />
+    <!-- Neck & Head -->
+    <rect x="64" y="78" width="8" height="22" fill="#C08052" />
+    <circle cx="68" cy="62" r="17" fill="#C08052" />
+    <circle cx="68" cy="44" r="10" fill="#3A2418" />
+    <path d="M51,62 C51,46 60,45 68,45 C76,45 85,46 85,62 C81,50 74,48 68,48 C62,48 55,50 51,62 Z" fill="#3A2418" />
+    <!-- Laughing face turned slightly -->
+    <path d="M60,61 Q64,64 67,61" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M70,61 Q74,64 77,61" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M64,69 Q68,75 73,69" stroke="#2A2622" stroke-width="2" fill="none" stroke-linecap="round" />
+    <circle cx="68" cy="55" r="1.8" fill="#D2401F" />
+    <!-- Arm raised waving -->
+    <path d="M88,98 L104,68 L112,72 L96,106 Z" fill="#D2401F" />
+    <circle cx="108" cy="66" r="6" fill="#C08052" />
+  </g>
+
+  <!-- 5. CENTER: Seated woman holding up certificate scroll -->
+  <g transform="translate(640, 180) scale(1.15)">
+    <!-- Seated posture in marigold & rani saree -->
+    <path d="M30,140 L100,140 C110,185 115,225 110,250 L20,250 C15,225 20,185 30,140 Z" fill="#FFC21A" />
+    <rect x="48" y="105" width="34" height="38" rx="4" fill="#D6336C" />
+    <!-- Saree pallu -->
+    <path d="M44,140 L88,105 L96,118 L50,152 Z" fill="#FFC21A" />
+    <!-- Neck & Head -->
+    <rect x="60" y="84" width="10" height="24" fill="#94603A" />
+    <circle cx="65" cy="66" r="18" fill="#94603A" />
+    <circle cx="65" cy="46" r="11" fill="#1B1210" />
+    <path d="M47,66 C47,48 56,47 65,47 C74,47 83,48 83,66 C79,54 72,52 65,52 C58,52 51,54 47,66 Z" fill="#1B1210" />
+    <path d="M58,65 Q61,68 64,65" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M68,65 Q71,68 74,65" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M61,74 Q65,79 70,74" stroke="#2A2622" stroke-width="2" fill="none" stroke-linecap="round" />
+    <circle cx="65" cy="59" r="2" fill="#D2401F" />
+    <!-- Holding Certificate scroll proudly with both hands -->
+    <circle cx="50" cy="142" r="5.5" fill="#94603A" />
+    <circle cx="80" cy="142" r="5.5" fill="#94603A" />
+    <rect x="44" y="132" width="42" height="14" rx="3" fill="#FFF6E5" stroke="#2A2622" stroke-width="1.5" />
+    <rect x="62" y="130" width="7" height="18" rx="1.5" fill="#D6336C" />
+  </g>
+
+  <!-- 6. PRIYA: MSc Mathematics scholar with books & graduation cap -->
+  <g transform="translate(790, 150) scale(1.22)">
+    <!-- Cobalt & Cream Salwar Kameez -->
+    <path d="M44,110 L94,110 L98,190 L40,190 Z" fill="#2B59D9" />
+    <path d="M46,180 C42,215 44,245 50,268 L60,268 C62,245 60,215 64,180 Z" fill="#FFF6E5" />
+    <path d="M92,180 C96,215 94,245 88,268 L78,268 C76,245 78,215 74,180 Z" fill="#FFF6E5" />
+    <!-- Blush dupatta draped over shoulder -->
+    <path d="M40,110 C50,130 65,130 75,110 L75,200 L65,200 Z" fill="#F6C1CF" />
+    <!-- Neck & Head -->
+    <rect x="64" y="82" width="10" height="28" fill="#C08052" />
+    <circle cx="69" cy="64" r="18" fill="#C08052" />
+    <!-- Sleek hair bun -->
+    <circle cx="69" cy="44" r="11" fill="#3A2418" />
+    <path d="M51,64 C51,48 60,47 69,47 C78,47 87,48 87,64 C83,52 76,50 69,50 C62,50 55,52 51,64 Z" fill="#3A2418" />
+    <!-- Glasses -->
+    <circle cx="63" cy="64" r="6.5" stroke="#2A2622" stroke-width="1.6" fill="none" />
+    <circle cx="75" cy="64" r="6.5" stroke="#2A2622" stroke-width="1.6" fill="none" />
+    <line x1="69.5" y1="64" x2="68.5" y2="64" stroke="#2A2622" stroke-width="1.6" />
+    <path d="M65,74 Q69,78 73,74" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <!-- Graduation Mortarboard Cap -->
+    <polygon points="69,30 90,37 69,44 48,37" fill="#2A2622" />
+    <rect x="58" y="39" width="22" height="7" rx="1.5" fill="#2A2622" />
+    <circle cx="69" cy="37" r="1.8" fill="#FFC21A" />
+    <path d="M69,37 L82,43 L84,50" stroke="#FFC21A" stroke-width="1.8" fill="none" />
+    <!-- Holding stack of research books -->
+    <rect x="56" y="136" width="32" height="9" rx="1.5" fill="#2B59D9" />
+    <rect x="58" y="134" width="28" height="3" fill="#FFF6E5" />
+    <rect x="54" y="144" width="36" height="10" rx="1.5" fill="#D2401F" />
+    <rect x="56" y="142" width="32" height="3" fill="#FFF6E5" />
+    <circle cx="56" cy="144" r="5" fill="#C08052" />
+    <circle cx="88" cy="144" r="5" fill="#C08052" />
+  </g>
+
+  <!-- 7. ANJALI: Student with notebook, kurta with jeans -->
+  <g transform="translate(930, 150) scale(1.22)">
+    <!-- Denim jeans -->
+    <path d="M52,165 L50,268 L60,268 L64,165 Z" fill="#2B59D9" />
+    <path d="M76,165 L80,268 L90,268 L86,165 Z" fill="#2B59D9" />
+    <!-- Mustard yellow Kurta -->
+    <path d="M42,108 L94,108 L98,172 L38,172 Z" fill="#FFC21A" />
+    <line x1="68" y1="108" x2="68" y2="148" stroke="#D2401F" stroke-width="2" />
+    <!-- Neck & Head -->
+    <rect x="63" y="80" width="10" height="28" fill="#F3D0B0" />
+    <circle cx="68" cy="62" r="18" fill="#F3D0B0" />
+    <!-- Bouncy modern curls -->
+    <circle cx="52" cy="52" r="9" fill="#6B3F25" />
+    <circle cx="62" cy="45" r="9" fill="#6B3F25" />
+    <circle cx="74" cy="45" r="9" fill="#6B3F25" />
+    <circle cx="84" cy="52" r="9" fill="#6B3F25" />
+    <path d="M54,54 C58,48 78,48 82,54 C78,50 60,50 54,54 Z" fill="#6B3F25" />
+    <!-- Smiling face -->
+    <path d="M61,61 Q64,64 67,61" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M71,61 Q74,64 77,61" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M64,71 Q68,76 73,71" stroke="#2A2622" stroke-width="2" fill="none" stroke-linecap="round" />
+    <!-- Holding notebook & pen -->
+    <polygon points="50,140 68,136 84,140 68,146" fill="#FFF6E5" stroke="#2A2622" stroke-width="1.5" />
+    <line x1="68" y1="136" x2="68" y2="146" stroke="#D2401F" stroke-width="1.5" />
+    <circle cx="50" cy="142" r="5" fill="#F3D0B0" />
+    <circle cx="84" cy="142" r="5" fill="#F3D0B0" />
+  </g>
+
+  <!-- 8. RIGHT: Woman in vibrant salwar kameez with bangles -->
+  <g transform="translate(1080, 160) scale(1.15)">
+    <path d="M42,108 L94,108 L98,190 L38,190 Z" fill="#D6336C" />
+    <path d="M46,180 C40,215 42,245 48,268 L60,268 C62,245 60,215 64,180 Z" fill="#FFC21A" />
+    <path d="M90,180 C96,215 94,245 88,268 L76,268 C74,245 76,215 72,180 Z" fill="#FFC21A" />
+    <rect x="63" y="80" width="10" height="28" fill="#6B4228" />
+    <circle cx="68" cy="62" r="18" fill="#6B4228" />
+    <circle cx="68" cy="42" r="11" fill="#1B1210" />
+    <path d="M50,62 C50,45 59,44 68,44 C77,44 86,45 86,62 C82,50 75,48 68,48 C61,48 54,50 50,62 Z" fill="#1B1210" />
+    <path d="M60,61 Q63,64 66,61" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M70,61 Q73,64 76,61" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M64,71 Q68,75 72,71" stroke="#2A2622" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <circle cx="68" cy="55" r="1.8" fill="#FFC21A" />
+    <!-- Arms with colorful stacked bangles -->
+    <rect x="42" y="145" width="8" height="3" fill="#FFC21A" />
+    <rect x="42" y="140" width="8" height="3" fill="#2B59D9" />
+    <rect x="88" y="145" width="8" height="3" fill="#FFC21A" />
+    <rect x="88" y="140" width="8" height="3" fill="#2B59D9" />
+    <circle cx="46" cy="154" r="5.5" fill="#6B4228" />
+    <circle cx="92" cy="154" r="5.5" fill="#6B4228" />
+  </g>
+
+  <!-- 9. FAR RIGHT (TALLER): Tall Artisan Instructor welcoming with open arms -->
+  <g transform="translate(1220, 80) scale(1.35)">
+    <path d="M40,130 L95,130 C100,180 102,230 98,280 L38,280 C34,230 36,180 40,130 Z" fill="#D2401F" />
+    <path d="M38,272 L98,272 L98,280 L38,280 Z" fill="#FFC21A" />
+    <path d="M44,104 L90,104 L94,136 L40,136 Z" fill="#0E4B33" />
+    <path d="M40,136 L88,104 L94,116 L46,146 Z" fill="#FFC21A" />
+    <rect x="62" y="80" width="10" height="26" fill="#46291A" />
+    <circle cx="67" cy="62" r="19" fill="#46291A" />
+    <circle cx="67" cy="40" r="12" fill="#1B1210" />
+    <circle cx="76" cy="38" r="4" fill="#FFC21A" />
+    <path d="M48,62 C48,46 56,44 67,44 C78,44 86,46 86,62 C82,50 74,48 67,48 C60,48 52,50 48,62 Z" fill="#1B1210" />
+    <path d="M59,62 Q63,65 67,62" stroke="#FFF6E5" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M71,62 Q75,65 79,62" stroke="#FFF6E5" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M64,72 Q67,76 71,72" stroke="#FFF6E5" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <circle cx="67" cy="55" r="2" fill="#FFC21A" />
+    <!-- Arms welcoming -->
+    <path d="M88,104 L110,80 L118,84 L96,114 Z" fill="#0E4B33" />
+    <circle cx="114" cy="78" r="6" fill="#46291A" />
+  </g>
+</svg>

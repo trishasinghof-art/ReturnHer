@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <!-- Plain cream background -->
+  <rect width="400" height="400" fill="#FFF6E5" />
+
+  <!-- Background organic arch block in Blush & Forest -->
+  <path d="M90,70 C130,25 270,25 310,70 C340,110 345,260 320,330 C295,370 105,370 80,330 C55,260 60,110 90,70 Z" fill="#F6C1CF" opacity="0.65" />
+  <circle cx="200" cy="180" r="145" fill="#F1E8D8" />
+
+  <!-- Surrounding Marigolds & Paisleys -->
+  <g transform="translate(65, 60)">
+    <ellipse cx="18" cy="8" rx="5" ry="7" fill="#FFC21A" />
+    <ellipse cx="18" cy="28" rx="5" ry="7" fill="#FFC21A" />
+    <ellipse cx="8" cy="18" rx="7" ry="5" fill="#FFC21A" />
+    <ellipse cx="28" cy="18" rx="7" ry="5" fill="#FFC21A" />
+    <circle cx="18" cy="18" r="6" fill="#D2401F" />
+    <circle cx="18" cy="18" r="3" fill="#FFC21A" />
+  </g>
+  <g transform="translate(295, 60)">
+    <ellipse cx="18" cy="8" rx="5" ry="7" fill="#FFC21A" />
+    <ellipse cx="18" cy="28" rx="5" ry="7" fill="#FFC21A" />
+    <ellipse cx="8" cy="18" rx="7" ry="5" fill="#FFC21A" />
+    <ellipse cx="28" cy="18" rx="7" ry="5" fill="#FFC21A" />
+    <circle cx="18" cy="18" r="6" fill="#D2401F" />
+    <circle cx="18" cy="18" r="3" fill="#FFC21A" />
+  </g>
+  <!-- Bangles accent on bottom left -->
+  <g transform="translate(60, 290)">
+    <circle cx="18" cy="18" r="15" stroke="#D6336C" stroke-width="3" fill="none" />
+    <circle cx="22" cy="22" r="15" stroke="#FFC21A" stroke-width="3" fill="none" />
+    <circle cx="26" cy="26" r="15" stroke="#2B59D9" stroke-width="3" fill="none" />
+  </g>
+  <!-- Rangoli dots on bottom right -->
+  <g transform="translate(305, 290)" fill="#FFC21A">
+    <circle cx="8" cy="8" r="3" />
+    <circle cx="24" cy="8" r="3" fill="#D2401F" />
+    <circle cx="8" cy="24" r="3" fill="#D2401F" />
+    <circle cx="24" cy="24" r="4" fill="#0E4B33" />
+  </g>
+
+  <!-- ================= SAKHI PORTRAIT ================= -->
+  <g transform="translate(90, 45) scale(1.1)">
+    <!-- Torso / Kurta in Deep Vermilion Red -->
+    <path d="M40,170 L160,170 L166,300 L34,300 Z" fill="#D2401F" />
+
+    <!-- Radiant Marigold Yellow Dupatta draped gracefully over head & shoulders -->
+    <path d="M42,160 C70,195 130,195 158,160 C172,205 170,270 162,300 L148,300 C154,265 156,215 146,182 C124,204 80,204 54,182 C44,215 46,265 52,300 L38,300 C30,270 28,205 42,160 Z" fill="#FFC21A" />
+
+    <!-- Neck -->
+    <rect x="92" y="125" width="16" height="42" fill="#E0A877" />
+
+    <!-- Head Circle -->
+    <circle cx="100" cy="98" r="28" fill="#E0A877" />
+
+    <!-- Hair under dupatta with traditional center parting -->
+    <circle cx="100" cy="62" r="18" fill="#1B1210" />
+    <circle cx="114" cy="60" r="5" fill="#FFC21A" />
+    <path d="M72,98 C72,70 86,68 100,68 C114,68 128,70 128,98 C122,80 110,76 100,76 C90,76 78,80 72,98 Z" fill="#1B1210" />
+
+    <!-- Dupatta veil contour over head -->
+    <path d="M68,100 C66,55 80,48 100,48 C120,48 134,55 132,100 C136,80 124,56 100,56 C76,56 64,80 68,100 Z" fill="#FFC21A" />
+    <path d="M66,96 C64,52 80,44 100,44 C120,44 136,52 134,96 C138,50 120,40 100,40 C80,40 62,50 66,96 Z" fill="#D2401F" />
+
+    <!-- Friendly, Kind Eyes (peaceful arcs with slight twinkle) -->
+    <path d="M86,96 Q92,102 98,96" stroke="#2A2622" stroke-width="2.2" fill="none" stroke-linecap="round" />
+    <path d="M102,96 Q108,102 114,96" stroke="#2A2622" stroke-width="2.2" fill="none" stroke-linecap="round" />
+
+    <!-- Vermilion Bindi on forehead -->
+    <circle cx="100.5" cy="87" r="2.8" fill="#D2401F" />
+
+    <!-- Warm, Joyful Smile Arc -->
+    <path d="M92,112 Q100,120 108,112" stroke="#2A2622" stroke-width="2.5" fill="none" stroke-linecap="round" />
+
+    <!-- Left hand resting gently on chest -->
+    <circle cx="68" cy="195" r="7.5" fill="#E0A877" />
+    <rect x="62" y="190" width="7" height="3" fill="#D6336C" />
+    <rect x="62" y="186" width="7" height="3" fill="#FFC21A" />
+
+    <!-- Right Arm RAISED WAVING WARMLY -->
+    <path d="M148,162 L180,98 L192,104 L160,172 Z" fill="#D2401F" />
+    <!-- Waving hand & palm -->
+    <circle cx="186" cy="94" r="8.5" fill="#E0A877" />
+    <path d="M182,86 C182,78 196,78 196,86 Z" fill="#E0A877" />
+    <!-- Bangles stacked on waving wrist -->
+    <rect x="176" y="99" width="10" height="3.5" rx="1" fill="#FFC21A" />
+    <rect x="178" y="104" width="10" height="3.5" rx="1" fill="#2B59D9" />
+    <rect x="180" y="109" width="10" height="3.5" rx="1" fill="#D6336C" />
+  </g>
+</svg>

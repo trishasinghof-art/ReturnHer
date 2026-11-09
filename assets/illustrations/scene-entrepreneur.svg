@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <!-- Plain cream background -->
+  <rect width="400" height="400" fill="#FFF6E5" />
+
+  <!-- Background organic warmth -->
+  <path d="M70,50 C200,20 330,50 360,150 C390,250 310,360 190,370 C70,380 30,290 35,180 C40,110 50,70 70,50 Z" fill="#F1E8D8" />
+  <circle cx="100" cy="85" r="45" fill="#F6C1CF" opacity="0.65" />
+
+  <!-- Decorative sun rays & marigold in sky -->
+  <g transform="translate(45, 45)">
+    <circle cx="22" cy="22" r="10" fill="#FFC21A" />
+    <line x1="22" y1="4" x2="22" y2="8" stroke="#D2401F" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="22" y1="36" x2="22" y2="40" stroke="#D2401F" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="4" y1="22" x2="8" y2="22" stroke="#D2401F" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="36" y1="22" x2="40" y2="22" stroke="#D2401F" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+  <g transform="translate(320, 50)">
+    <ellipse cx="18" cy="8" rx="5" ry="7" fill="#FFC21A" />
+    <ellipse cx="18" cy="28" rx="5" ry="7" fill="#FFC21A" />
+    <ellipse cx="8" cy="18" rx="7" ry="5" fill="#FFC21A" />
+    <ellipse cx="28" cy="18" rx="7" ry="5" fill="#FFC21A" />
+    <circle cx="18" cy="18" r="6" fill="#D2401F" />
+    <circle cx="18" cy="18" r="3" fill="#FFC21A" />
+  </g>
+
+  <!-- ================= MARKET SHOP STALL ================= -->
+  <!-- Striped Scalloped Awning / Canopy Overhead -->
+  <g transform="translate(50, 45)">
+    <!-- Awning roof angle -->
+    <polygon points="10,40 290,40 270,0 30,0" fill="#0E4B33" />
+    <!-- Yellow awning stripes -->
+    <polygon points="50,40 85,40 80,0 52,0" fill="#FFC21A" />
+    <polygon points="120,40 155,40 150,0 122,0" fill="#FFC21A" />
+    <polygon points="190,40 225,40 220,0 192,0" fill="#FFC21A" />
+    <polygon points="260,40 290,40 270,0 252,0" fill="#FFC21A" />
+    <!-- Scalloped bottom edge valance -->
+    <path d="M10,40 Q25,58 40,40 Q55,58 70,40 Q85,58 100,40 Q115,58 130,40 Q145,58 160,40 Q175,58 190,40 Q205,58 220,40 Q235,58 250,40 Q265,58 280,40 Q285,50 290,40" fill="#FFC21A" stroke="#0E4B33" stroke-width="2" />
+    <!-- Wooden corner support poles -->
+    <rect x="25" y="40" width="8" height="210" fill="#2A2622" />
+    <rect x="267" y="40" width="8" height="210" fill="#2A2622" />
+  </g>
+
+  <!-- ================= WOMAN ENTREPRENEUR (BEHIND COUNTER) ================= -->
+  <g transform="translate(130, 80) scale(1.15)">
+    <!-- Kurta in Forest Green with Marigold dupatta -->
+    <path d="M40,110 L94,110 L98,200 L36,200 Z" fill="#0E4B33" />
+    <rect x="44" y="104" width="46" height="40" rx="4" fill="#0E4B33" />
+    <!-- Radiant Marigold dupatta draped around neck -->
+    <path d="M38,104 C52,126 82,126 96,104 C104,124 102,165 98,190 L90,190 C94,165 94,130 88,114 C74,126 58,126 48,114 C42,130 42,165 46,190 L38,190 C34,165 32,124 38,104 Z" fill="#FFC21A" />
+
+    <!-- Neck & Head -->
+    <rect x="62" y="78" width="10" height="28" fill="#6B4228" />
+    <circle cx="67" cy="62" r="18" fill="#6B4228" />
+    <!-- Short chic crop hair -->
+    <path d="M48,64 C47,44 56,40 67,40 C78,40 87,44 86,64 C88,74 81,76 79,70 C76,50 58,50 55,70 C53,76 47,74 48,64 Z" fill="#1B1210" />
+
+    <!-- Radiant, Confident Smiling Expression -->
+    <path d="M59,62 Q62,65 65,62" stroke="#FFF6E5" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M69,62 Q72,65 75,62" stroke="#FFF6E5" stroke-width="1.8" fill="none" stroke-linecap="round" />
+    <path d="M63,72 Q67,77 72,72" stroke="#FFF6E5" stroke-width="2" fill="none" stroke-linecap="round" />
+    <circle cx="67" cy="55" r="1.8" fill="#D2401F" />
+
+    <!-- Left hand resting on counter -->
+    <path d="M40,104 L32,145 L42,148 L50,110 Z" fill="#0E4B33" />
+    <circle cx="36" cy="150" r="5.5" fill="#6B4228" />
+
+    <!-- Right arm welcoming / presenting goods -->
+    <path d="M94,104 L114,136 L106,142 L88,112 Z" fill="#0E4B33" />
+    <circle cx="114" cy="142" r="5.5" fill="#6B4228" />
+    <!-- Bangles on wrist -->
+    <rect x="106" y="136" width="6" height="3" fill="#FFC21A" />
+    <rect x="106" y="132" width="6" height="3" fill="#D6336C" />
+  </g>
+
+  <!-- ================= WOODEN SHOP COUNTER ================= -->
+  <rect x="65" y="240" width="270" height="18" rx="4" fill="#2A2622" />
+  <!-- Counter front panel in oat & forest vertical slats -->
+  <rect x="75" y="258" width="250" height="95" fill="#0E4B33" />
+  <line x1="110" y1="258" x2="110" y2="353" stroke="#0A2F21" stroke-width="3" />
+  <line x1="150" y1="258" x2="150" y2="353" stroke="#0A2F21" stroke-width="3" />
+  <line x1="190" y1="258" x2="190" y2="353" stroke="#0A2F21" stroke-width="3" />
+  <line x1="230" y1="258" x2="230" y2="353" stroke="#0A2F21" stroke-width="3" />
+  <line x1="270" y1="258" x2="270" y2="353" stroke="#0A2F21" stroke-width="3" />
+
+  <!-- Goods on Display Counter -->
+  <!-- 1. Terracotta clay pots (left) -->
+  <g transform="translate(85, 208)">
+    <ellipse cx="16" cy="30" rx="14" ry="12" fill="#D2401F" />
+    <rect x="10" y="16" width="12" height="4" rx="1.5" fill="#C08052" />
+    <ellipse cx="16" cy="16" rx="6" ry="2" fill="#FFF6E5" />
+    <path d="M6,30 Q16,35 26,30" stroke="#FFC21A" stroke-width="1.8" fill="none" />
+  </g>
+
+  <!-- 2. Basket with rolled handlooms (center-right) -->
+  <g transform="translate(245, 212)">
+    <polygon points="4,28 36,28 32,12 8,12" fill="#FFC21A" stroke="#2A2622" stroke-width="1.5" />
+    <!-- Rolled fabrics sticking out -->
+    <rect x="10" y="2" width="6" height="16" rx="3" fill="#D6336C" />
+    <rect x="18" y="0" width="6" height="18" rx="3" fill="#2B59D9" />
+    <rect x="25" y="4" width="6" height="14" rx="3" fill="#0E4B33" />
+  </g>
+
+  <!-- Small woven brass coin bowl / MUDRA token on counter -->
+  <g transform="translate(180, 230)">
+    <ellipse cx="15" cy="8" rx="12" ry="5" fill="#FFC21A" stroke="#2A2622" stroke-width="1.2" />
+    <circle cx="12" cy="7" r="2.5" fill="#D2401F" />
+    <circle cx="17" cy="8" r="2.5" fill="#D2401F" />
+  </g>
+</svg>
