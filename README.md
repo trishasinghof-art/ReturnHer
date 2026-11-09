@@ -4,7 +4,7 @@ A local prototype for exploring education, skills, and earning pathways.
 
 ReturnHer helps women explore sample government-supported pathways using their education, skills, goal, state, and district. It is a bilingual prototype and does not represent a government service.
 
-Live demo: https://your-username.github.io/returnher/
+Live demo: [https://your-username.github.io/returnher/](https://returnher.vercel.app)
 
 Built for Hackathon Name, Month 2026.
 
