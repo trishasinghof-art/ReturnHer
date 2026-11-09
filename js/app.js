@@ -225,7 +225,7 @@
     navEl.className = isHome ? "navbar navbar--hero" : "navbar";
 
     const authPill = profile
-      ? `<a href="#/me" class="btn btn-sm ${isHome ? 'btn-outline-dark' : 'btn-outline'}" style="border-radius: var(--radius-pill); font-size:15px;">
+      ? `<a href="#/me" class="navbar-profile btn btn-sm ${isHome ? 'btn-outline-dark' : 'btn-outline'}" aria-label="My journey: ${escapeHtml(profile.name)}" title="${escapeHtml(profile.name)}" style="border-radius: var(--radius-pill); font-size:15px;">
           <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--color-marigold); margin-right:4px;"></span>
           ${escapeHtml(profile.name)}
         </a>`
@@ -1246,26 +1246,11 @@
   }
 
   // 5. Personal Pathway View (#/path)
-  function renderPath() {
-    const app = document.getElementById("app-view");
-    const profile = Storage.getProfile();
-    const opps = window.OPPORTUNITIES || [];
+  const educationRanks = { class10: 1, class12: 2, graduate: 3, postgraduate: 4 };
 
-    if (!profile) {
-      app.innerHTML = `
-        <section class="section section-cream">
-          <div class="container text-center" style="padding: 60px 0;">
-            <h2>${t("route.path.title")}</h2>
-            <p style="margin: 20px 0;">Please answer a few gentle questions first so we can map your pathway.</p>
-            <a href="#/start" class="btn btn-primary">${t("btn.start_onboarding")}</a>
-          </div>
-        </section>
-      `;
-      return;
-    }
-
+  function getPathMatches(profile, opportunities) {
+    const profileEducation = educationRanks[profile.education] || educationRanks.class10;
     const goalTags = profile.goal === "find-government-job" ? ["govt-job"] : [profile.goal];
-    const profileSkills = Array.isArray(profile.skills) ? profile.skills : [];
     const skillKeywords = {
       tailoring: ["tailoring", "sewing"],
       embroidery: ["embroidery"],
@@ -1273,67 +1258,292 @@
       teaching: ["teaching", "trainer"],
       "beauty-wellness": ["beauty", "wellness"],
       "computer-basics": ["computer", "digital"],
+      computers: ["computer", "digital"],
       handicrafts: ["handicraft", "craft"],
-      design: ["design"]
+      design: ["design"],
+      mathematics: ["mathematics", "math"],
+      "data analysis": ["data analysis"],
+      "academic research": ["research"],
+      writing: ["writing", "academic writing"],
+      communication: ["communication"]
     };
-    const selectedGoal = wizardGoals.find(option => option.id === profile.goal);
-
-    // Match opportunities based on education, goal, and skills
-    const matched = opps.filter(o => {
-      const matchGoal = o.goalTags && o.goalTags.some(goal => goalTags.includes(goal));
-      const matchEdu = o.minEducation === profile.education;
-      const matchSkill = (o.skillTags || []).some(tag => {
-        const normalizedTag = tag.toLowerCase();
-        return profileSkills.some(skill => {
-          const keywords = skillKeywords[skill] || [skill];
-          return keywords.some(keyword => normalizedTag.includes(keyword.toLowerCase()));
-        });
+    const profileSkills = (Array.isArray(profile.skills) ? profile.skills : [])
+      .map(skill => String(skill).trim().toLowerCase())
+      .filter(Boolean);
+    const skillMatchesFor = opportunity => {
+      const tags = (opportunity.skillTags || []).map(tag => tag.toLowerCase());
+      return profileSkills.filter(skill => {
+        const keywords = skillKeywords[skill] || [skill];
+        return keywords.some(keyword => tags.some(tag => tag.includes(keyword)));
       });
-      return matchGoal || matchEdu || matchSkill;
-    });
+    };
+    const modeFits = opportunity => {
+      const preferred = profile.mode || "both";
+      return preferred === "both" || opportunity.mode === "both" || preferred === opportunity.mode;
+    };
 
-    const displayOpps = matched.length > 0 ? matched : opps.slice(0, 4);
+    // Keep only goal/skill matches; score goal +3, skills +2, eligible education +2,
+    // matching state/All India +1, compatible mode +1, and needed financial support +1.
+    // Higher education requirements and distance/fully online PhD options are excluded.
+    return opportunities.map(opportunity => {
+      const qualificationMeets = profileEducation >= (educationRanks[opportunity.minEducation] || 1);
+      const matchesGoal = (opportunity.goalTags || []).some(tag => goalTags.includes(tag));
+      const matchingSkills = skillMatchesFor(opportunity);
+      const stateMatch = opportunity.states === "All India"
+        || String(opportunity.states || "").split(",").map(state => state.trim()).includes(profile.state);
+      const modeMatch = modeFits(opportunity);
+      const isPhd = (opportunity.goalTags || []).includes("research-phd")
+        || /ph\.?d|doctoral/i.test(`${opportunity.title} ${opportunity.type}`);
+      const phdText = `${opportunity.title} ${opportunity.type} ${opportunity.whatYouGet}`;
+      const excludesPhdMode = isPhd && (
+        opportunity.mode === "online"
+        || /distance|fully online/i.test(`${opportunity.title} ${opportunity.type}`)
+        || (
+          /distance|fully online/i.test(opportunity.whatYouGet)
+          && !/not permitted|not allowed|prohibited/i.test(opportunity.whatYouGet)
+        )
+      );
+      if (!qualificationMeets || excludesPhdMode || (!matchesGoal && matchingSkills.length === 0)) return null;
+
+      const financialSupportMatch = Boolean(profile.financialSupportNeeded)
+        && /scholarship|fellowship|loan|stipend/i.test(
+          `${opportunity.title} ${opportunity.type} ${opportunity.whatYouGet}`
+        );
+      const score = (matchesGoal ? 3 : 0)
+        + (matchingSkills.length > 0 ? 2 : 0)
+        + (qualificationMeets ? 2 : 0)
+        + (stateMatch ? 1 : 0)
+        + (modeMatch ? 1 : 0)
+        + (financialSupportMatch ? 1 : 0);
+      const reasons = [];
+      if (matchesGoal) {
+        const goal = wizardGoals.find(item => item.id === profile.goal);
+        reasons.push(`${t("path.reason.goal")}: ${goal ? t(goal.label) : profile.goal}`);
+      }
+      if (matchingSkills.length > 0) {
+        const years = Number(profile.experienceYears) || 0;
+        const skill = matchingSkills[0];
+        reasons.push(years > 0
+          ? t("path.reason.experience").replace("{years}", years).replace("{skill}", skill)
+          : t("path.reason.skill").replace("{skill}", skill));
+      }
+      if (qualificationMeets) {
+        reasons.push(t("path.reason.education").replace(
+          "{education}",
+          t(`tag.edu.${opportunity.minEducation}`)
+        ));
+      }
+      if (stateMatch) {
+        reasons.push(opportunity.states === "All India"
+          ? t("path.reason.allIndia")
+          : t("path.reason.state").replace("{state}", profile.state));
+      }
+      if (modeMatch) reasons.push(t("path.reason.mode"));
+      if (financialSupportMatch) reasons.push(t("path.reason.support"));
+      return { opportunity, score, reasons };
+    }).filter(Boolean).sort((a, b) => b.score - a.score);
+  }
+
+  function getPathStages(profile, matches) {
+    const matchById = new Map(matches.map(match => [match.opportunity.id, match]));
+    const profileId = (window.PROFILES || []).find(item => item.name === profile.name)?.id;
+    const sampleStages = {
+      sunita: [
+        ["path.sunita.stage1", ["cert-rpl-tailoring"]],
+        ["path.sunita.stage2", ["cert-jss-tailoring"]],
+        ["path.sunita.stage3", ["opp-pm-vishwakarma"]],
+        ["path.sunita.stage4", ["supp-mudra-loan"]]
+      ],
+      priya: [
+        ["path.priya.stage1", ["edu-doctoral-fellowship"]],
+        ["path.priya.stage2", ["edu-ugc-phd"]],
+        ["path.priya.stage3", ["edu-ncs-research-assistant"]]
+      ],
+      anjali: [
+        ["path.anjali.stage1", ["edu-ignou-ug", "edu-nios-class12"]],
+        ["path.anjali.stage2", ["edu-nsp-scholarship"]],
+        ["path.anjali.stage3", ["cert-digital-skills"]]
+      ]
+    };
+    const stageColors = ["cobalt", "vermilion", "marigold", "forest"];
+    if (sampleStages[profileId]) {
+      const used = new Set();
+      const stages = sampleStages[profileId].map(([title, ids], index) => {
+        const items = ids.map(id => matchById.get(id)).filter(Boolean);
+        items.forEach(item => used.add(item.opportunity.id));
+        return { title: t(title), color: stageColors[index % stageColors.length], items };
+      }).filter(stage => stage.items.length > 0);
+      const remaining = matches.filter(match => !used.has(match.opportunity.id));
+      if (remaining.length) {
+        stages.push({
+          title: t("path.stage.more"),
+          color: stageColors[stages.length % stageColors.length],
+          items: remaining.slice(0, 2)
+        });
+      }
+      return stages;
+    }
+
+    const selectedGoal = wizardGoals.find(option => option.id === profile.goal);
+    const titles = [
+      selectedGoal ? t(selectedGoal.label) : t("path.stage.first"),
+      t("path.stage.second"), t("path.stage.third"), t("path.stage.more")
+    ];
+    const ranked = matches.slice(0, 8);
+    const count = Math.min(4, Math.ceil(ranked.length / 2));
+    return Array.from({ length: count }, (_, index) => ({
+      title: titles[index],
+      color: stageColors[index % stageColors.length],
+      items: ranked.slice(index * 2, index * 2 + 2)
+    }));
+  }
+
+  function renderPath(isProfileSwitch = false) {
+    const app = document.getElementById("app-view");
+    const profile = Storage.getProfile();
+    const opps = window.OPPORTUNITIES || [];
+
+    if (!profile) {
+      window.location.hash = "#/start";
+      return;
+    }
+
+    Storage.setTrackerProgress("profile-created", true);
+    Storage.setTrackerProgress("goal-chosen", Boolean(profile.goal));
+    Storage.setTrackerProgress("path-reviewed", true);
+    const matches = getPathMatches(profile, opps);
+    const stages = getPathStages(profile, matches);
+    const selectedGoal = wizardGoals.find(option => option.id === profile.goal);
+    const educationLabel = t(`tag.edu.${profile.education}`);
+    const skills = (Array.isArray(profile.skills) ? profile.skills : [])
+      .filter(Boolean).map(skill => {
+        const key = `wizard.skill.${String(skill).toLowerCase()}`;
+        return t(key) === key ? String(skill) : t(key);
+      });
+    const demoProfiles = window.PROFILES || [];
+    const profileId = demoProfiles.find(item => item.name === profile.name)?.id;
+    const avatarScenes = { sunita: "tailor", priya: "scholar", anjali: "learner" };
+    const tracker = Storage.getTrackerProgress();
+    const savedIds = Storage.getSavedOpportunities();
+    const applicationStarted = Boolean(tracker["application-started"]);
+    const journeySteps = [
+      ["profile-created", t("path.progress.profile")],
+      ["goal-chosen", t("path.progress.goal")],
+      ["path-reviewed", t("path.progress.reviewed")],
+      ["first-saved", t("path.progress.saved")],
+      ["application-started", t("path.progress.application")]
+    ];
 
     app.innerHTML = `
-      <section class="section section-cream">
-        <div class="container">
-          <div style="margin-bottom: 40px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
-            <div>
-              <span class="tag tag--support" style="margin-bottom: 12px;">${t("tagline.sakhi")}</span>
-              <h1>${escapeHtml(profile.name)}'s ${t("route.path.title")}</h1>
-              <p style="font-size: 20px; color: var(--color-ink); margin-top: 8px;">
-                ${escapeHtml(profile.district || profile.location || 'India')}, ${escapeHtml(profile.state || '')} &bull; Goal: ${selectedGoal ? t(selectedGoal.label) : escapeHtml(profile.goal)}
-              </p>
-            </div>
-            <a href="#/start" class="btn btn-sm btn-outline">Update Profile</a>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap: 32px;">
-            ${displayOpps
-              .map((o, idx) => `
-              <div class="card shape-arch block-behind block-behind--${o.pillar === 'education' ? 'cobalt' : o.pillar === 'certification' ? 'vermilion' : o.pillar === 'opportunity' ? 'forest' : 'marigold'} fade-up">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-                  <div style="display:flex; gap:10px; align-items:center;">
-                    <span class="tag tag--${o.pillar}">Step ${idx + 1}: ${t(`pillar.${o.pillar}`)}</span>
-                    <span class="tag">${t(`tag.edu.${o.minEducation}`)}</span>
-                  </div>
-                  <button class="heart-btn ${Storage.isSaved(o.id) ? 'saved' : ''}" onclick="window.toggleSaveOpportunity('${o.id}')">
-                    ${Storage.isSaved(o.id) ? ICONS.heartFilled : ICONS.heart}
-                  </button>
-                </div>
-
-                <h3 style="font-size: 24px; margin-bottom: 8px;">
-                  <a href="#/opportunity/${o.id}">${escapeHtml(o.title)}</a>
-                </h3>
-                <p style="font-size: 17px; margin-bottom: 16px; line-height: 1.5;">${escapeHtml(o.whatYouGet)}</p>
-
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-                  <a href="#/opportunity/${o.id}" class="btn btn-sm btn-primary">${t("btn.view_details")}</a>
-                  <a href="#/apply/${o.id}" class="btn btn-sm btn-outline">${t("btn.apply_guide")}</a>
-                </div>
+      <section class="path-page ${isProfileSwitch ? "path-page--switch" : ""}">
+        <header class="path-hero">
+          <div class="container path-hero-inner">
+            <div class="path-heading">
+              <span class="tag tag--opportunity">${t("tagline.sakhi")}</span>
+              <h1>${t("path.hello").replace("{name}", escapeHtml(profile.name || t("nav.journey")))}</h1>
+              <div class="path-profile-chips">
+                <span class="path-profile-chip">${escapeHtml(educationLabel)}</span>
+                ${skills.slice(0, 3).map(skill => `<span class="path-profile-chip">${escapeHtml(skill)}</span>`).join("")}
+                <span class="path-profile-chip">${escapeHtml(profile.district || profile.location || "India")}</span>
+                <span class="path-profile-chip">${selectedGoal ? t(selectedGoal.label) : escapeHtml(profile.goal || "")}</span>
+                <a class="path-edit-link" href="#/start">${t("path.edit")}</a>
               </div>
-            `).join("")}
+            </div>
+            <div class="path-sample-switch">
+              <p>${t("path.tryAnother")}</p>
+              <div class="path-sample-list">
+                ${demoProfiles.map(sample => `
+                  <button class="path-sample-chip ${profileId === sample.id ? "is-current" : ""}"
+                    type="button" onclick="window.switchPathProfile('${sample.id}')"
+                    aria-pressed="${profileId === sample.id}">
+                    <span class="path-sample-avatar">${window.ART ? window.ART.scene(avatarScenes[sample.id]) : ""}</span>
+                    <span>${escapeHtml(sample.name)}</span>
+                  </button>
+                `).join("")}
+              </div>
+            </div>
           </div>
+          <svg class="path-wave" viewBox="0 0 1200 48" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 0 C150 42 350 48 500 24 C650 0 850 44 1050 22 C1150 11 1200 32 1200 48 L1200 48 L0 48Z" fill="var(--color-cream)"></path>
+          </svg>
+        </header>
+        <div class="container path-layout">
+          <main class="path-main">
+            <div class="path-section-heading">
+              <h2>${t("path.yourPath")}</h2>
+              <p>${t("route.path.desc")}</p>
+            </div>
+            <div class="path-stages">
+              <svg class="path-road" viewBox="0 0 100 1000" preserveAspectRatio="none" aria-hidden="true">
+                <path class="path-road-base journey-path" d="M50 0 C50 70 15 90 18 170 C20 250 80 255 80 340 C80 425 20 440 20 520 C20 600 80 615 80 700 C80 790 45 815 50 1000"></path>
+                <path class="path-road-center journey-path" d="M50 0 C50 70 15 90 18 170 C20 250 80 255 80 340 C80 425 20 440 20 520 C20 600 80 615 80 700 C80 790 45 815 50 1000"></path>
+                <circle cx="18" cy="170" r="8" fill="var(--color-marigold)"></circle>
+                <circle cx="80" cy="340" r="8" fill="var(--color-marigold)"></circle>
+                <circle cx="20" cy="520" r="8" fill="var(--color-marigold)"></circle>
+                <circle cx="80" cy="700" r="8" fill="var(--color-marigold)"></circle>
+              </svg>
+              ${stages.map((stage, index) => `
+                <section class="path-station path-station--${index % 2 ? "right" : "left"} fade-up" style="--station-color:var(--color-${stage.color})">
+                  <div class="path-station-number">${index + 1}</div>
+                  <div class="path-station-figure" aria-hidden="true">${window.ART ? window.ART.scene(["tailor", "scholar", "learner", "teacher"][index % 4]) : ""}</div>
+                  <div class="path-station-card">
+                    <span class="path-station-kicker">${t("path.step").replace("{number}", index + 1)}</span>
+                    <h3>${escapeHtml(stage.title)}</h3>
+                    <div class="path-opportunities">
+                      ${stage.items.map(({ opportunity, reasons }) => {
+                        const saved = Storage.isSaved(opportunity.id);
+                        return `
+                          <article class="path-opportunity">
+                            <div class="path-opportunity-meta">
+                              <span class="tag tag--${escapeHtml(opportunity.pillar)}">${t(`pillar.${opportunity.pillar}`)}</span>
+                              <span class="path-requirement">${t(`tag.edu.${opportunity.minEducation}`)}</span>
+                            </div>
+                            <h4><a href="#/opportunity/${encodeURIComponent(opportunity.id)}">${escapeHtml(opportunity.title)}</a></h4>
+                            <p class="path-department">${escapeHtml(opportunity.department)}</p>
+                            <h5>${t("path.whyFits")}</h5>
+                            <ul class="path-reasons">
+                              ${reasons.map(reason => `<li>${ICONS.check}<span>${escapeHtml(reason)}</span></li>`).join("")}
+                            </ul>
+                            <div class="path-opportunity-actions">
+                              <button type="button" class="path-save ${saved ? "is-saved" : ""}"
+                                onclick="window.toggleSaveOpportunity('${escapeHtml(opportunity.id)}')"
+                                aria-label="${t(saved ? "btn.remove_save" : "btn.save")}">
+                                ${ICONS.marigold}<span>${t(saved ? "path.saved" : "btn.save")}</span>
+                              </button>
+                              <a href="#/opportunity/${encodeURIComponent(opportunity.id)}" class="path-detail-link">${t("btn.view_details")}</a>
+                            </div>
+                            <details class="path-eligibility">
+                              <summary>${t("path.eligible")}</summary>
+                              <ul>${opportunity.eligibilityQuestions.map(question => `<li>${escapeHtml(question)}</li>`).join("")}</ul>
+                              <p>${t("path.eligibilityNote")}</p>
+                              <a href="#/apply/${encodeURIComponent(opportunity.id)}" data-application-start="true" class="path-guide-link">${t("path.applicationGuide")}</a>
+                            </details>
+                          </article>
+                        `;
+                      }).join("")}
+                    </div>
+                  </div>
+                </section>
+              `).join("")}
+              <div class="path-finish">
+                <div class="path-finish-arch">${window.ART ? window.ART.decor("marigold", { size: 68 }) : ""}</div>
+                <h3>${t("path.finish")}</h3>
+              </div>
+            </div>
+            <p class="path-demo-note">${t("notice.prototype")}</p>
+          </main>
+          <aside class="path-progress-panel">
+            <h2>${t("path.progress.title")}</h2>
+            <ol class="path-progress-list">
+              ${journeySteps.map(([key, label]) => {
+                const done = key === "first-saved" ? savedIds.length > 0
+                  : key === "application-started" ? applicationStarted
+                    : Boolean(tracker[key]);
+                return `<li class="${done ? "is-complete" : ""}"><span class="path-progress-bead">${done ? ICONS.check : ""}</span><span>${label}</span></li>`;
+              }).join("")}
+            </ol>
+            <button type="button" class="btn btn-outline path-sakhi-button" disabled>${t("path.askSakhi")}</button>
+          </aside>
         </div>
       </section>
     `;
@@ -1963,22 +2173,36 @@
     router(); // Re-render current view to reflect new state
   };
 
+  function getDemoProfileData(found) {
+    return {
+      name: found.name,
+      education: found.education,
+      skills: found.skills,
+      goal: found.goals[0] || "learn-skill",
+      district: found.district,
+      state: found.state,
+      location: found.location,
+      experienceYears: found.experienceYears,
+      mode: found.mode,
+      financialSupportNeeded: Boolean(found.financialSupportNeeded)
+    };
+  }
+
+  window.switchPathProfile = function (profileId) {
+    const found = (window.PROFILES || []).find(profile => profile.id === profileId);
+    if (!found) return;
+    Storage.saveProfile(getDemoProfileData(found));
+    onboardingDraft = null;
+    onboardingStep = 0;
+    renderNavbar();
+    renderPath(true);
+  };
+
   window.loadDemoProfile = function (profileId) {
     const profiles = window.PROFILES || [];
     const found = profiles.find(p => p.id === profileId);
     if (found) {
-      Storage.saveProfile({
-        name: found.name,
-        education: found.education,
-        skills: found.skills,
-        goal: found.goals[0] || "learn-skill",
-        district: found.district,
-        state: found.state,
-        location: found.location,
-        experienceYears: found.experienceYears,
-        mode: found.mode,
-        financialSupportNeeded: Boolean(found.financialSupportNeeded)
-      });
+      Storage.saveProfile(getDemoProfileData(found));
       onboardingDraft = null;
       onboardingStep = 0;
       showToast(`${found.name}'s profile loaded!`);
@@ -1988,18 +2212,22 @@
   };
 
   document.getElementById("app-view").addEventListener("click", event => {
-    const link = event.target instanceof Element
-      ? event.target.closest('a[href="#three-women"]')
-      : null;
-    if (!link) return;
+    const target = event.target instanceof Element ? event.target : null;
+    const applicationLink = target && target.closest("[data-application-start]");
+    if (applicationLink) {
+      Storage.setTrackerProgress("application-started", true);
+    }
 
-    event.preventDefault();
-    const section = document.getElementById("three-women");
-    if (section) {
-      section.scrollIntoView({
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-        block: "start"
-      });
+    const homeLink = target && target.closest('a[href="#three-women"]');
+    if (homeLink) {
+      event.preventDefault();
+      const section = document.getElementById("three-women");
+      if (section) {
+        section.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start"
+        });
+      }
     }
   });
 
